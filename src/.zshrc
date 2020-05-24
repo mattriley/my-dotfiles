@@ -1,0 +1,68 @@
+# echo "Loading .zshrc"
+source ~/.bash_profile
+
+# Path to your oh-my-zsh installation.
+export ZSH=~/.oh-my-zsh
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time oh-my-zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+ZSH_THEME="robbyrussell"
+
+# Which plugins would you like to load?
+# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(
+  git
+  zsh-nvm
+  zsh-autosuggestions
+)
+
+# zsh-nvm
+export NVM_COMPLETION=true 
+export NVM_LAZY_LOAD=true
+export NVM_NO_USE=true
+export NVM_AUTO_USE=true
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+export JAVA_HOME=jdk-install-dir
+export PATH=$JAVA_HOME/bin:$PATH
+
+alias z=". ~/.zshrc"
+alias batect="./batect"
+
+function commit() {
+    default_message="Unspecified changes"
+    message=${1:-$default_message}
+    git add -A
+    git commit -m"$message"
+    git push
+}
+
+function use_flib() {
+    export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
+    export FLIB_DIR_PATH=~/Home/Code/flib
+    node_version=`cat $FLIB_DIR_PATH/.nvmrc`    
+    nvm use $node_version
+}
+
+function use_streamdestiny() {
+    STREAM_DESTINY_DIR_PATH=~/Home/Code/streamdestiny
+    node_version=`cat $STREAM_DESTINY_DIR_PATH/.nvmrc`    
+    nvm use $node_version
+    cd $STREAM_DESTINY_DIR_PATH
+    export BOOKMARKS_EVENT_DOCUMENT=~/Home/Code/my-data/src/event-data/bookmarks/uncategorised.json
+    export BOOKMARKS_COLLECTION_DOCUMENT=~/Home/Code/my-data/dist/collections/bookmarks.json
+    export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
+}
+
+function dev() {
+    cd ~/Home/Code/$1
+    code .
+}
