@@ -37,6 +37,10 @@ export PATH=$JAVA_HOME/bin:$PATH
 alias z=". ~/.zshrc"
 alias batect="./batect"
 
+function killport() { 
+    lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
+}
+
 function commit() {
     default_message="Unspecified changes"
     message=${1:-$default_message}
@@ -62,7 +66,3 @@ function use_streamdestiny() {
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
-function dev() {
-    cd ~/Home/Code/$1
-    code .
-}
