@@ -41,6 +41,13 @@ function killport() {
     lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
 }
 
+function list_all_processes() {
+    ps aux
+    # a = show processes for all users
+    # u = display the process's user/owner
+    # x = also show processes not attached to a terminal
+}
+
 function docker_list_all_container_ids() {
     docker ps -aq
 }
