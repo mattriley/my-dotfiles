@@ -41,6 +41,22 @@ function killport() {
     lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
 }
 
+function docker_list_all_container_ids() {
+    docker ps -aq
+}
+
+function docker_stop_all_running_containers() {
+    docker stop $(docker ps -aq)
+}
+
+function docker_remove_all_containers() {
+    docker rm $(docker ps -aq)
+}
+
+function docker_remove_all_images() {
+    docker rmi $(docker images -q)
+}
+
 function commit() {
     default_message="Unspecified changes"
     message=${1:-$default_message}
