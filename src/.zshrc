@@ -48,6 +48,10 @@ function list_all_processes() {
     # x = also show processes not attached to a terminal
 }
 
+function filter_processes() {
+    ps aux | grep $1
+}
+
 function docker_list_all_container_ids() {
     docker ps -aq
 }
