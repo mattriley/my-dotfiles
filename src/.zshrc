@@ -34,7 +34,7 @@ source $ZSH/oh-my-zsh.sh
 export JAVA_HOME=jdk-install-dir
 export PATH=$JAVA_HOME/bin:$PATH
 
-alias z=". ~/.zshrc"
+alias reload=". ~/.zshrc"
 alias batect="./batect"
 
 function killport() { 
@@ -66,6 +66,10 @@ function docker_remove_all_containers() {
 
 function docker_remove_all_images() {
     docker rmi $(docker images -q)
+}
+
+function docker_bash() {
+    docker container run -it $1 bash
 }
 
 function commit() {
