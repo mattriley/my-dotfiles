@@ -145,7 +145,7 @@
         "no-magic-numbers": "off",
         "no-mixed-operators": "error",
         "no-mixed-requires": "error",
-        "no-multi-assign": "error",
+        "no-multi-assign": "off",
         "no-multi-spaces": "error",
         "no-multi-str": "error",
         "no-multiple-empty-lines": "off",
