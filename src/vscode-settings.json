@@ -1,0 +1,17 @@
+{
+    "files.autoSave": "onFocusChange",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "explorer.compactFolders": false,
+    "editor.lineHeight": 25,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.detectIndentation": false,
+    "window.zoomLevel": 1,    
+    "debug.node.autoAttach": "on",
+    "eslint.format.enable": true,
+    "eslint.alwaysShowStatus": true,
+    "eslint.workingDirectories": [],
+    "javascript.updateImportsOnFileMove.enabled": "never",
+    "javascript.preferences.useAliasesForRenames": false
+}
