@@ -97,3 +97,10 @@ function use_streamdestiny() {
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
+function brew_install() {
+    brew install tree
+}
+
+function clear_bash_history() {
+    history -c
+}
