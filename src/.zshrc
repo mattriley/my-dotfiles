@@ -35,6 +35,7 @@ export JAVA_HOME=jdk-install-dir
 export PATH=$JAVA_HOME/bin:$PATH
 
 alias reload=". ~/.zshrc"
+alias k="kubeCtl"
 alias batect="./batect"
 
 function killport() { 
