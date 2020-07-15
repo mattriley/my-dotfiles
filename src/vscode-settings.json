@@ -7,6 +7,9 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "editor.detectIndentation": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
     "window.zoomLevel": 1,    
     "debug.node.autoAttach": "on",
     "eslint.format.enable": true,
