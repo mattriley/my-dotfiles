@@ -6,7 +6,6 @@
     "editor.lineHeight": 25,
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.detectIndentation": false,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
