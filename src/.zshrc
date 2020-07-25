@@ -78,6 +78,10 @@ function commit() {
     message=${1:-$default_message}
     git add -A
     git commit -m"$message"
+}
+
+function push() {
+    commit $@
     git push
 }
 
