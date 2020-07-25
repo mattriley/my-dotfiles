@@ -15,5 +15,8 @@
     "eslint.alwaysShowStatus": true,
     "eslint.workingDirectories": [],
     "javascript.updateImportsOnFileMove.enabled": "never",
-    "javascript.preferences.useAliasesForRenames": false
+    "javascript.preferences.useAliasesForRenames": false,
+    "editor.minimap.enabled": false,
+    "todo-tree.tree.showScanModeButton": false,
+    "sync.gist": "c3153764cd06269e900fb65fe397475a"
 }
