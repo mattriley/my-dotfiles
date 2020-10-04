@@ -37,6 +37,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 alias reload=". ~/.zshrc"
 alias k="kubeCtl"
 alias batect="./batect"
+alias task="./task"
 
 function killport() { 
     lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
