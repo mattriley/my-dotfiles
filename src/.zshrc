@@ -86,21 +86,27 @@ function push() {
     git push
 }
 
+function use_photos() {
+    cd ~/docs/matt/photos
+    use_flib
+}
+
 function use_flib() {
     export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
-    export FLIB_DIR_PATH=~/Home/Code/flib
+    export FLIB_DIR_PATH=~/code/flib
+    export FLIB_DATA_DIR=~/code/my-data/src/flib-data
     node_version=`cat $FLIB_DIR_PATH/.nvmrc`    
     nvm use $node_version
 }
 
 function use_streamdestiny() {
-    STREAM_DESTINY_DIR_PATH=~/Home/Code/streamdestiny
+    STREAM_DESTINY_DIR_PATH=~/code/streamdestiny
     node_version=`cat $STREAM_DESTINY_DIR_PATH/.nvmrc`    
     nvm use $node_version
     cd $STREAM_DESTINY_DIR_PATH
-    export BOOKMARKS_EVENT_DOCUMENT=~/Home/Code/my-data/src/event-data/bookmarks/uncategorised.json
-    export BOOKMARKS_COLLECTION_DOCUMENT=~/Home/Code/my-data/dist/collections/bookmarks.json
-    export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
+    export BOOKMARKS_EVENT_DOCUMENT=~/Code/my-data/src/event-data/bookmarks/uncategorised.json
+    export BOOKMARKS_COLLECTION_DOCUMENT=~/Code/my-data/dist/collections/bookmarks.json
+    export BOOKMARKS_SCRAPER_CACHE=~/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
 function brew_install() {
