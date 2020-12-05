@@ -19,5 +19,6 @@
     "editor.minimap.enabled": false,
     "todo-tree.tree.showScanModeButton": false,
     "sync.gist": "c3153764cd06269e900fb65fe397475a",
-    "javascript.suggest.autoImports": false
+    "javascript.suggest.autoImports": false,
+    "editor.columnSelection": false
 }
