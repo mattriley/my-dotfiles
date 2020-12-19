@@ -11,6 +11,7 @@
     },
     "window.zoomLevel": 1,    
     "debug.node.autoAttach": "on",
+    "eslint.validate": ["javascript"],
     "eslint.format.enable": true,
     "eslint.alwaysShowStatus": true,
     "eslint.workingDirectories": [],
@@ -20,5 +21,6 @@
     "todo-tree.tree.showScanModeButton": false,
     "sync.gist": "c3153764cd06269e900fb65fe397475a",
     "javascript.suggest.autoImports": false,
-    "editor.columnSelection": false
+    "editor.columnSelection": false,
+    "explorer.autoReveal": "focusNoScroll"
 }

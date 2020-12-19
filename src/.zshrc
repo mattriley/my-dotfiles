@@ -39,7 +39,19 @@ alias k="kubeCtl"
 alias batect="./batect"
 alias task="./task"
 
-function killport() { 
+function brew_install() {
+    brew install tree
+}
+
+function clear_bash_history() {
+    history -c
+}
+
+function file_count() {
+    find . -type f | wc -l
+}
+
+function kill_port() { 
     lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
 }
 
@@ -109,10 +121,3 @@ function use_streamdestiny() {
     export BOOKMARKS_SCRAPER_CACHE=~/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
-function brew_install() {
-    brew install tree
-}
-
-function clear_bash_history() {
-    history -c
-}
