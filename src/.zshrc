@@ -41,6 +41,7 @@ alias task="./task"
 
 function brew_install() {
     brew install tree
+    brew install ffmpeg
 }
 
 function clear_bash_history() {
