@@ -50,6 +50,7 @@ function clear_bash_history() {
 
 function file_count() {
     find . -type f | wc -l
+    # excludes symlinks
 }
 
 function kill_port() { 
@@ -104,12 +105,13 @@ function use_photos() {
     use_flib
 }
 
+export FLIB_DATA_BASE_PATH=~/code/my-data/src/flib-data
+
 function use_flib() {
     export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
-    export FLIB_DIR_PATH=~/code/flib
-    export FLIB_DATA_DIR=~/code/my-data/src/flib-data
+    export FLIB_DIR_PATH=~/code/flib    
     node_version=`cat $FLIB_DIR_PATH/.nvmrc`    
-    nvm use $node_version
+    nvm use $node_version   
 }
 
 function use_streamdestiny() {

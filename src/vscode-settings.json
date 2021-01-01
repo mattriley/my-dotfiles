@@ -10,7 +10,6 @@
         "source.fixAll.eslint": true
     },
     "window.zoomLevel": 1,    
-    "debug.node.autoAttach": "on",
     "eslint.validate": ["javascript"],
     "eslint.format.enable": true,
     "eslint.alwaysShowStatus": true,
@@ -18,9 +17,12 @@
     "javascript.updateImportsOnFileMove.enabled": "never",
     "javascript.preferences.useAliasesForRenames": false,
     "editor.minimap.enabled": false,
-    "todo-tree.tree.showScanModeButton": false,
     "sync.gist": "c3153764cd06269e900fb65fe397475a",
     "javascript.suggest.autoImports": false,
     "editor.columnSelection": false,
-    "explorer.autoReveal": "focusNoScroll"
+    "explorer.autoReveal": "focusNoScroll",
+    "editor.quickSuggestions": false,
+    "editor.parameterHints.enabled": false,
+    "editor.suggestOnTriggerCharacters": false,
+    "editor.hover.enabled": false,
 }
