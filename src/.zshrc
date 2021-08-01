@@ -114,6 +114,10 @@ function use_flib() {
     nvm use $node_version   
 }
 
+function flib_missing_faces() {
+    flib group --field "photo.hasAnyFaces" --tags "min or min-only or edit-p"
+}
+
 function use_streamdestiny() {
     STREAM_DESTINY_DIR_PATH=~/code/streamdestiny
     node_version=`cat $STREAM_DESTINY_DIR_PATH/.nvmrc`    
