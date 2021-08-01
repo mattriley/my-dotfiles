@@ -115,7 +115,7 @@ function use_flib() {
 }
 
 function flib_missing_faces() {
-    flib group --field "photo.hasAnyFaces" --tags "min or min-only or edit-p"
+    flib group --by "photo.hasAnyFaces" --tags "missingFaces"
 }
 
 function use_streamdestiny() {
