@@ -115,7 +115,7 @@ function use_flib() {
 }
 
 function flib_missing_faces() {
-    flib group --by "photo.hasAnyFaces" --tags "missingFaces"
+    flib group --by "photo.hasAnyFaces" --schemeName "missingFaces"
 }
 
 function use_streamdestiny() {
