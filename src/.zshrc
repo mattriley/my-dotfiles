@@ -101,7 +101,7 @@ function push() {
 }
 
 function use_photos() {
-    cd ~/docs/matt/photos
+    cd ~"/docs/Matt • Photos"
     use_flib
 }
 

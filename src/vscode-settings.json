@@ -25,4 +25,5 @@
     "_editor.parameterHints.enabled": false,
     "editor.suggestOnTriggerCharacters": false,
     "editor.hover.enabled": false,
+    "workbench.editor.enablePreview": false,
 }
