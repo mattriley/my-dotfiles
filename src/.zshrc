@@ -105,13 +105,18 @@ function use_photos() {
     use_flib
 }
 
-export FLIB_DATA_BASE_PATH=~/code/my-data/src/flib-data
+export FLIB_DATA_BASE_PATH="$HOME/code/my-data/src/flib-data"
+export FLIB_CODE_PATH="$HOME/code/flib"
+
+function use_flib() {
+    export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
+    node_version=`cat $FLIB_CODE_PATH/.nvmrc`    
+    nvm use $node_version   
+}
 
 function dev_flib() {
-    export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
-    export FLIB_DIR_PATH=~/code/flib    
-    node_version=`cat $FLIB_DIR_PATH/.nvmrc`    
-    nvm use $node_version   
+    cd $FLIB_CODE_PATH
+    ./task itermocil
 }
 
 function flib_missing_faces() {
