@@ -107,7 +107,7 @@ function use_photos() {
 
 export FLIB_DATA_BASE_PATH=~/code/my-data/src/flib-data
 
-function use_flib() {
+function dev_flib() {
     export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
     export FLIB_DIR_PATH=~/code/flib    
     node_version=`cat $FLIB_DIR_PATH/.nvmrc`    
