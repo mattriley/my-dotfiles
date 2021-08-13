@@ -109,7 +109,7 @@ export FLIB_DATA_BASE_PATH="$HOME/code/my-data/src/flib-data"
 export FLIB_CODE_PATH="$HOME/code/flib"
 
 function use_flib() {
-    #export NODE_OPTIONS="--max_old_space_size=4096 --inspect"
+    export NODE_OPTIONS="--max_old_space_size=4096" # --inspect"
     node_version=`cat $FLIB_CODE_PATH/.nvmrc`    
     nvm use $node_version   
 }
