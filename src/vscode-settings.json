@@ -10,9 +10,9 @@
         "source.fixAll.eslint": true
     },
     "window.zoomLevel": 1,    
-    "eslint.validate": ["javascript"],
-    "eslint.format.enable": true,
-    "eslint.alwaysShowStatus": true,
+    "eslint.validate": [
+        "javascript"
+    ],
     "eslint.workingDirectories": [],
     "javascript.updateImportsOnFileMove.enabled": "never",
     "javascript.preferences.useAliasesForRenames": false,
@@ -26,4 +26,14 @@
     "editor.suggestOnTriggerCharacters": false,
     "editor.hover.enabled": false,
     "workbench.editor.enablePreview": false,
+    "eslint.alwaysShowStatus": true,
+    "eslint.format.enable": true,
+    "eslint.quiet": true,
+    "eslint.codeAction.showDocumentation": {
+        "enable": false
+    },
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingDelete": "never",
+    "editor.autoClosingQuotes": "never",
+    "files.insertFinalNewline": true,
 }

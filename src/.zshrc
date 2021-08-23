@@ -120,7 +120,7 @@ function dev_flib() {
 }
 
 function flib_missing_faces() {
-    flib group --by "photo.hasAnyFaces" --schemeName "missingFaces"
+    flib group --by "photo.facesAssigned" --schemeName "missingFaces"
 }
 
 function use_streamdestiny() {
