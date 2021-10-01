@@ -101,7 +101,7 @@ function push() {
 }
 
 function use_photos() {
-    cd ~"/docs/Photos"
+    cd "$HOME/Home/Photos"
     use_flib
 }
 
@@ -117,10 +117,6 @@ function use_flib() {
 function dev_flib() {
     cd $FLIB_CODE_PATH
     ./task itermocil
-}
-
-function flib_missing_faces() {
-    flib group --by "photo.facesAssigned" --schemeName "missingFaces"
 }
 
 function use_streamdestiny() {
