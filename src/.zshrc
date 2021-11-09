@@ -17,9 +17,10 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  zsh-nvm
-  zsh-autosuggestions
 )
+
+#   zsh-nvm
+#   zsh-autosuggestions
 
 # zsh-nvm
 export NVM_COMPLETION=true 
