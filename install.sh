@@ -7,8 +7,8 @@ ln -sf $cwd/src/.bash_profile ~/.bash_profile
 ln -sf $cwd/src/.bashrc ~/.bashrc
 
 ln -sf $cwd/src/.eslintrc ~/.eslintrc
-cp $cwd/src/.eslintrc ~/code/agileavatars/
-cp $cwd/src/.eslintrc ~/code/flib/
+cp $cwd/src/.eslintrc ~/Home/Code/agileavatars/
+cp $cwd/src/.eslintrc ~/Home/Code/flib/
 
 ln -sf $cwd/src/.gitconfig ~/.gitconfig
 ln -sf $cwd/src/.zshrc ~/.zshrc

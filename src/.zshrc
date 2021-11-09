@@ -105,8 +105,8 @@ function use_photos() {
     use_flib
 }
 
-export FLIB_DATA_BASE_PATH="$HOME/code/my-data/src/flib-data"
-export FLIB_CODE_PATH="$HOME/code/flib"
+export FLIB_DATA_BASE_PATH="$HOME/Home/code/my-data/src/flib-data"
+export FLIB_CODE_PATH="$HOME/Home/code/flib"
 
 function use_flib() {
     #export NODE_OPTIONS="--max_old_space_size=4096" # --inspect"
@@ -120,12 +120,12 @@ function dev_flib() {
 }
 
 function use_streamdestiny() {
-    STREAM_DESTINY_DIR_PATH=~/code/streamdestiny
+    STREAM_DESTINY_DIR_PATH=~/Home/code/streamdestiny
     node_version=`cat $STREAM_DESTINY_DIR_PATH/.nvmrc`    
     nvm use $node_version
     cd $STREAM_DESTINY_DIR_PATH
-    export BOOKMARKS_EVENT_DOCUMENT=~/Code/my-data/src/event-data/bookmarks/uncategorised.json
-    export BOOKMARKS_COLLECTION_DOCUMENT=~/Code/my-data/dist/collections/bookmarks.json
-    export BOOKMARKS_SCRAPER_CACHE=~/Code/my-data/src/app-data/bookmarks-scraper-cache    
+    export BOOKMARKS_EVENT_DOCUMENT=~/Home/Code/my-data/src/event-data/bookmarks/uncategorised.json
+    export BOOKMARKS_COLLECTION_DOCUMENT=~/Home/Code/my-data/dist/collections/bookmarks.json
+    export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
