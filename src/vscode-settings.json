@@ -37,4 +37,7 @@
     "editor.autoClosingDelete": "never",
     "editor.autoClosingQuotes": "never",
     "files.insertFinalNewline": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
 }
