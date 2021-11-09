@@ -102,7 +102,7 @@ function push() {
 }
 
 function use_photos() {
-    cd "$HOME/Home/Photos"
+    cd "$HOME/Home/Photos • Matt"
     use_flib
 }
 
@@ -130,3 +130,7 @@ function use_streamdestiny() {
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
