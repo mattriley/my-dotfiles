@@ -32,34 +32,19 @@ plugins=(
   zsh-autosuggestions
 )
 
-#   zsh-nvm
-#   zsh-autosuggestions
-
-# zsh-nvm
-export NVM_COMPLETION=true 
-export NVM_LAZY_LOAD=true
-export NVM_NO_USE=true
-export NVM_AUTO_USE=true
+# nvm 
+# export NVM_LAZY=0
+export NVM_AUTOLOAD=1
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-export JAVA_HOME=jdk-install-dir
-export PATH=$JAVA_HOME/bin:$PATH
-
-alias reload=". ~/.zshrc"
-alias k="kubeCtl"
-alias batect="./batect"
 alias task="./task"
 
 function brew_install() {
     brew install tree
     brew install ffmpeg
-}
-
-function clear_bash_history() {
-    history -c
 }
 
 function file_count() {
@@ -119,11 +104,9 @@ function use_photos() {
     use_flib
 }
 
-export FLIB_DATA_BASE_PATH="$HOME/Home/code/my-data/src/flib-data"
 export FLIB_CODE_PATH="$HOME/Home/code/flib"
 
 function use_flib() {
-    #export NODE_OPTIONS="--max_old_space_size=4096" # --inspect"
     node_version=`cat $FLIB_CODE_PATH/.nvmrc`    
     nvm use $node_version   
 }
@@ -146,6 +129,5 @@ function use_streamdestiny() {
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 eval "$(direnv hook zsh)" # keep at end
