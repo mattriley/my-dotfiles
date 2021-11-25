@@ -21,8 +21,13 @@ plugins=(
   dirhistory
   fastfile
   git
-  nvm
   httpie
+  jsontools
+  macos
+  nvm
+  safe-paste
+  timer
+  urltools
   web-search
   zsh-autosuggestions
 )
