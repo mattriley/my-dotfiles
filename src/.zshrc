@@ -43,8 +43,8 @@ source $ZSH/oh-my-zsh.sh
 alias task="./task"
 
 function brew_install() {
-    brew install tree
-    brew install ffmpeg
+    brew install direnv ffmpeg httpie itermocil tree 
+    brew cask install alt-tab
 }
 
 function file_count() {
