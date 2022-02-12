@@ -99,7 +99,12 @@ function push() {
     git push
 }
 
-function use_photos() {
+function notes() {
+    cd "$HOME/Home/Notes"
+    code .
+}
+
+function photos() {
     cd "$HOME/Home/Photos • Matt"
     use_flib
 }
@@ -115,6 +120,11 @@ function dev_flib() {
     cd $FLIB_CODE_PATH
     ./task itermocil
 }
+
+function flib_groupby() {
+    flib group --by photo.hasSubject.$1 --schemeName sub --tags "not edit" --yes
+}
+
 
 function use_streamdestiny() {
     STREAM_DESTINY_DIR_PATH=~/Home/code/streamdestiny
