@@ -122,8 +122,8 @@ function dev_flib() {
 }
 
 function flib_groupby() {
-    flib group --by photo.hasSubject.$1 --schemeName sub --yes
-    # flib group --by photo.hasSubject.$1 --schemeName sub --tags "not edit" --yes
+    # flib group --by photo.hasSubject.$1 --schemeName sub --yes
+    flib group --by photo.hasSubject.$1 --schemeName sub --tags "not edit" --yes
 }
 
 
