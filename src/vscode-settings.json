@@ -41,5 +41,10 @@
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "security.workspace.trust.untrustedFiles": "open",
-    "json.schemas": []
+    "json.schemas": [],
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "editor.detectIndentation": false,
+    "workbench.iconTheme": "vscode-icons"
 }

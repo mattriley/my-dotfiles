@@ -91,11 +91,18 @@ function commit() {
     default_message="Unspecified changes"
     message=${1:-$default_message}
     git add -A
-    git commit -m"$message"
+    git commit -m"$message" 
+}
+
+function fcommit() {
+    default_message="Unspecified changes"
+    message=${1:-$default_message}
+    git add -A
+    git commit -m"$message" --no-verify
 }
 
 function push() {
-    commit $@
+    commit "$@"
     git push
 }
 
