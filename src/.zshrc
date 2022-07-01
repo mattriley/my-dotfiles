@@ -1,5 +1,6 @@
 # echo "Loading .zshrc"
 source ~/.bash_profile
+source ~/hostvars.sh
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
@@ -40,65 +41,13 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-alias task="./task"
-
-function brew_install() {
-    brew install direnv ffmpeg httpie itermocil tree 
-    brew cask install alt-tab
-}
-
-function file_count() {
-    find . -type f | wc -l
-    # excludes symlinks
-}
-
-function kill_port() { 
-    lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
-}
-
-function list_all_processes() {
-    ps aux
-    # a = show processes for all users
-    # u = display the process's user/owner
-    # x = also show processes not attached to a terminal
-}
-
-function filter_processes() {
-    ps aux | grep $1
-}
-
-function docker_list_all_container_ids() {
-    docker ps -aq
-}
-
-function docker_stop_all_running_containers() {
-    docker stop $(docker ps -aq)
-}
-
-function docker_remove_all_containers() {
-    docker rm $(docker ps -aq)
-}
-
-function docker_remove_all_images() {
-    docker rmi $(docker images -q)
-}
-
-function docker_bash() {
-    docker container run -it $1 bash
-}
+export FLIB_CODE_PATH="$HOME/Home/code/flib"
 
 function commit() {
     default_message="Unspecified changes"
     message=${1:-$default_message}
     git add -A
-    git commit -m"$message" 
-}
-
-function fcommit() {
-    default_message="Unspecified changes"
-    message=${1:-$default_message}
-    git add -A
-    git commit -m"$message" --no-verify
+    git commit -m"$message" "${@:2}"
 }
 
 function push() {
@@ -116,23 +65,15 @@ function photos() {
     use_flib
 }
 
-export FLIB_CODE_PATH="$HOME/Home/code/flib"
-
 function use_flib() {
     node_version=`cat $FLIB_CODE_PATH/.nvmrc`    
     nvm use $node_version   
-}
-
-function dev_flib() {
-    cd $FLIB_CODE_PATH
-    ./task itermocil
 }
 
 function flib_groupby() {
     # flib group --by photo.hasSubject.$1 --schemeName sub --yes
     flib group --by photo.hasSubject.$1 --schemeName sub --tags "not edit" --yes
 }
-
 
 function use_streamdestiny() {
     STREAM_DESTINY_DIR_PATH=~/Home/code/streamdestiny
@@ -143,7 +84,6 @@ function use_streamdestiny() {
     export BOOKMARKS_COLLECTION_DOCUMENT=~/Home/Code/my-data/dist/collections/bookmarks.json
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
-
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

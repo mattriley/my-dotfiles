@@ -9,7 +9,7 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    "window.zoomLevel": 1,    
+    
     "eslint.validate": [
         "javascript"
     ],
@@ -46,5 +46,14 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "editor.detectIndentation": false,
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "theme-by-language.themes": {
+        "markdown": "Default Light+",
+        "javascript": "Default Dark+"
+    },
+    "window.zoomLevel": 1,
+    "editor.suggest.showMethods": true,
+    "editor.suggest.preview": true,
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.snippetSuggestions": "top"
 }
