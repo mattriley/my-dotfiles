@@ -43,6 +43,10 @@ source $ZSH/oh-my-zsh.sh
 
 export FLIB_CODE_PATH="$HOME/Home/code/flib"
 
+function t() {
+    npx task "$@"
+}
+
 function commit() {
     default_message="Unspecified changes"
     message=${1:-$default_message}
