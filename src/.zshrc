@@ -43,6 +43,10 @@ source $ZSH/oh-my-zsh.sh
 
 export FLIB_CODE_PATH="$HOME/Home/code/flib"
 
+function kill_port() { 
+    lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
+}
+
 function t() {
     npx task "$@"
 }
@@ -57,6 +61,13 @@ function commit() {
 function push() {
     commit "$@"
     git push
+}
+
+function tink() {
+    DIR="$HOME/code/temp"
+    mkdir -p $DIR
+    cd $DIR
+    code "$(date +"%Y-%m-%dT%H-%M").js" .
 }
 
 function notes() {

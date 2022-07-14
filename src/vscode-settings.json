@@ -1,59 +1,59 @@
 {
-    "files.autoSave": "onFocusChange",
-    "explorer.confirmDragAndDrop": false,
-    "explorer.confirmDelete": false,
-    "explorer.compactFolders": false,
-    "editor.lineHeight": 30,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingDelete": "never",
+    "editor.autoClosingQuotes": "never",
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    
+    "editor.columnSelection": false,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": true,
+    "editor.hover.enabled": true,
+    "editor.lineHeight": 30,
+    "editor.minimap.enabled": false,
+    "editor.parameterHints": false,
+    "editor.parameterHints.enabled": false,
+    "editor.snippetSuggestions": "top",
+    "editor.suggest.preview": true,
+    "editor.suggest.showMethods": true,
+    "editor.suggestOnTriggerCharacters": false,
+    "eslint.alwaysShowStatus": true,
+    "eslint.codeAction.showDocumentation": {
+        "enable": false
+    },
+    "eslint.format.enable": true,
+    "eslint.quiet": true,
     "eslint.validate": [
         "javascript"
     ],
     "eslint.workingDirectories": [],
-    "javascript.updateImportsOnFileMove.enabled": "never",
-    "javascript.preferences.useAliasesForRenames": false,
-    "editor.minimap.enabled": false,
-    "sync.gist": "c3153764cd06269e900fb65fe397475a",
-    "javascript.suggest.autoImports": false,
-    "editor.columnSelection": false,
-    "_explorer.autoReveal": "focusNoScroll",
     "explorer.autoReveal": true,
-    "_editor.quickSuggestions": false,
-    "editor.parameterHints.enabled": false,
-    "editor.suggestOnTriggerCharacters": false,
-    "editor.hover.enabled": false,
-    "workbench.editor.enablePreview": false,
-    "eslint.alwaysShowStatus": true,
-    "eslint.format.enable": true,
-    "eslint.quiet": true,
-    "eslint.codeAction.showDocumentation": {
-        "enable": false
-    },
-    "editor.autoClosingBrackets": "never",
-    "editor.autoClosingDelete": "never",
-    "editor.autoClosingQuotes": "never",
+    "explorer.compactFolders": false,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "files.autoSave": "onFocusChange",
     "files.insertFinalNewline": true,
-    "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "security.workspace.trust.untrustedFiles": "open",
+    "javascript.preferences.useAliasesForRenames": false,
+    "javascript.suggest.autoImports": false,
+    "javascript.updateImportsOnFileMove.enabled": "never",
     "json.schemas": [],
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "editor.detectIndentation": false,
-    "workbench.iconTheme": "vscode-icons",
+    "quokka.automaticRestart": true,
+    "security.workspace.trust.untrustedFiles": "open",
     "theme-by-language.themes": {
         "markdown": "Default Light+",
         "javascript": "Default Dark+"
     },
+    "window.commandCenter": true,
     "window.zoomLevel": 1,
-    "editor.suggest.showMethods": true,
-    "editor.suggest.preview": true,
-    "editor.acceptSuggestionOnEnter": "on",
-    "editor.snippetSuggestions": "top"
+    "workbench.editor.enablePreview": false,
+    "workbench.iconTheme": "vscode-icons"
 }
