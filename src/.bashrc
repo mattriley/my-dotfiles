@@ -1,9 +1,8 @@
 # echo "Loading .bashrc"
 
-export AUTHOR_NAME="Matt Riley"
-export AUTHOR_EMAIL="m@ttriley.dev"
-export AUTHOR_URL="https://github.com/mattriley"
-export AUTHOR_GITHUB_USER_NAME="mattriley"
+export DEFAULT_AUTHOR_NAME="Matt Riley"
+export DEFAULT_AUTHOR_EMAIL="m@ttriley.dev"
+export DEFAULT_AUTHOR_URL="https://github.com/mattriley"
 
 DRAWIO="/Applications/draw.io.app/Contents/MacOS"
 
