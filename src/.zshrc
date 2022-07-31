@@ -48,7 +48,7 @@ function kill_port() {
 }
 
 function t() {
-    npx task "$@"
+    npx -p "task-library" task "$@"
 }
 
 function commit() {

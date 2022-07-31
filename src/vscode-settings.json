@@ -28,6 +28,7 @@
         "comments": "inline",
         "strings": "inline"
     },
+    "editor.renderWhitespace": "trailing",
     "editor.snippetSuggestions": "top",
     "editor.suggest.preview": true,
     "editor.suggest.showMethods": true,
