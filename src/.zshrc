@@ -52,37 +52,34 @@ function t() {
 }
 
 function commit() {
-    default_message="Unspecified changes"
-    message=${1:-$default_message}
+    local default_message="Unspecified changes"
+    local message=${1:-$default_message}
     git add -A
     git commit -m"$message" "${@:2}"
 }
 
 function push() {
-    commit "$@"
-    git push
+    commit "$@" && git push
 }
 
 function tink() {
-    DIR="$HOME/code/temp"
-    mkdir -p $DIR
-    cd $DIR
+    local temp="$HOME/code/temp"
+    mkdir -p "$temp"
+    cd "$temp"
     code "$(date +"%Y-%m-%dT%H-%M").js" .
 }
 
 function notes() {
-    cd "$HOME/Home/Notes"
-    code .
+    cd "$HOME/Home/Notes" && code .
 }
 
 function photos() {
-    cd "$HOME/Home/Photos • Matt"
-    use_flib
+    cd "$HOME/Home/Photos • Matt" && use_flib
 }
 
 function use_flib() {
-    node_version=`cat $FLIB_CODE_PATH/.nvmrc`    
-    nvm use $node_version   
+    local node_version="$(cat $FLIB_CODE_PATH/.nvmrc)"
+    nvm use "$node_version"
 }
 
 function flib_groupby() {

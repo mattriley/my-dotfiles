@@ -1,5 +1,5 @@
 [user]
-	email = mattrileyaus@gmail.com
+	email = m@ttriley.dev
 	name = Matt Riley
 [filter "lfs"]
 	clean = git-lfs clean -- %f

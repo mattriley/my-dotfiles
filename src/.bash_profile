@@ -1,3 +1,3 @@
-# echo "Loading .bash_profile"
-source ~/.bashrc
+#!/bin/bash
 
+source ~/.bashrc

@@ -50,6 +50,10 @@
     "explorer.compactFolders": false,
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "*.js": "${capture}.test.js, ${capture}.js.map, ${capture}.min.js, ${capture}.d.ts"
+    },
     "files.autoSave": "onFocusChange",
     "files.insertFinalNewline": true,
     "javascript.preferences.useAliasesForRenames": false,
