@@ -67,7 +67,7 @@
         "javascript": "Default Dark+"
     },
     "window.commandCenter": true,
-    "window.zoomLevel": 1,
     "workbench.editor.enablePreview": false,
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "window.zoomLevel": 1
 }

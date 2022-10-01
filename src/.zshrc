@@ -47,21 +47,6 @@ function kill_port() {
     lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 
 }
 
-function t() {
-    npx -p "task-library" task "$@"
-}
-
-function commit() {
-    local default_message="Unspecified changes"
-    local message=${1:-$default_message}
-    git add -A
-    git commit -m"$message" "${@:2}"
-}
-
-function push() {
-    commit "$@" && git push
-}
-
 function tink() {
     local temp="$HOME/code/temp"
     mkdir -p "$temp"
@@ -69,12 +54,8 @@ function tink() {
     code "$(date +"%Y-%m-%dT%H-%M").js" .
 }
 
-function notes() {
-    cd "$HOME/Home/Notes" && code .
-}
-
 function photos() {
-    cd "$HOME/Home/Photos • Matt" && use_flib
+    cd "$MY_PHOTOS" && use_flib
 }
 
 function use_flib() {
@@ -97,7 +78,6 @@ function use_streamdestiny() {
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 
 eval "$(direnv hook zsh)" # keep at end

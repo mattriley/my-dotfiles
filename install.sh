@@ -15,7 +15,7 @@ function install {
     node "sort-vscode-settings.js"
     ln -sf "$cwd/src/vscode-settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
 
-    echo "done."
+    echo "done"
 
 }
 
