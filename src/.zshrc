@@ -68,7 +68,3 @@ function use_streamdestiny() {
     export BOOKMARKS_COLLECTION_DOCUMENT=~/Home/Code/my-data/dist/collections/bookmarks.json
     export BOOKMARKS_SCRAPER_CACHE=~/Home/Code/my-data/src/app-data/bookmarks-scraper-cache    
 }
-
-
-
-eval "$(direnv hook zsh)" # keep at end
