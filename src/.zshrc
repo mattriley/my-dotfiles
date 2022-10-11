@@ -17,19 +17,10 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  copyfile
-  direnv
   dirhistory
-  fastfile
   git
-  httpie
-  jsontools
-  macos
   nvm
-  safe-paste
   timer
-  urltools
-  web-search
   zsh-autosuggestions
 )
 
