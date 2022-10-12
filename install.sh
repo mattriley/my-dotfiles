@@ -1,22 +1,21 @@
 #!/bin/bash
 
+function link {
+    local source="$1"
+    local dest="${2:-$1}"
+    ln -sf "$(pwd)/src/$source" "$HOME/$dest"
+}
+
 function install {
 
-    echo "Installing dotfiles..."
-
-    local cwd; cwd=$(pwd)
-
-    ln -sf "$cwd/src/.bash_profile" ~/.bash_profile
-    ln -sf "$cwd/src/.bashrc" ~/.bashrc
-
-    ln -sf "$cwd/src/.gitconfig" ~/.gitconfig
-    ln -sf "$cwd/src/.zshrc" ~/.zshrc
-
     node "sort-vscode-settings.js"
-    ln -sf "$cwd/src/vscode-settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
-
-    echo "done"
+    link "vscode-settings.json" "Library/Application Support/Code/User/settings.json"
+    link ".gitconfig"    
+    link ".bash_profile"
+    link ".bashrc"    
+    link ".zshrc"
 
 }
 
 install
+echo "done"
