@@ -4,7 +4,7 @@ NORM=$(tput sgr0)
 BOLD=$(tput bold)
 
 function install {
-    local profile="${1:-default}"    
+    local profile="$1"    
     local target="profiles/$profile"
 
     echo "Installing $BOLD$profile$NORM profile..."
@@ -14,8 +14,10 @@ function install {
         while IFS= read -r -d '' path; do 
             ln -sfv "$(pwd)/$path" "$HOME${path#"$target"}"
         done
+
+    echo
 }
 
-install "$@"
 echo
-echo "done"
+install "default"
+[ "$1" ] && install "$1" 

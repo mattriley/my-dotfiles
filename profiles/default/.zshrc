@@ -1,6 +1,6 @@
 # echo "Loading .zshrc"
 source ~/.bash_profile
-source ~/hostvars.sh
+
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
@@ -24,8 +24,8 @@ plugins=(
   zsh-autosuggestions
 )
 
-# nvm 
+# nvm plugin
 # export NVM_LAZY=0
 export NVM_AUTOLOAD=1
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"

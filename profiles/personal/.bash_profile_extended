@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export MY_PHOTOS="$HOME/Home/Photos • Matt"
+export FLIB_CODE_PATH="$HOME/Home/code/flib"
+
+function flib.photos {
+    local node_version; node_version="$(cat "$FLIB_CODE_PATH/.nvmrc")"
+    cd "$MY_PHOTOS" && nvm use "$node_version"
+}
+
+function flib.groupby {
+    # flib group --by photo.hasSubject.$1 --schemeName sub --yes
+    flib group --by "photo.hasSubject.$1" --schemeName sub --tags "not edit" --yes
+}
