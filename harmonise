@@ -1,0 +1,14 @@
+#!/bin/bash
+
+function sort_vscode_settings {
+    find profiles/*/Library/"Application Support"/Code/*/settings.json -type f -print0 | 
+        while IFS= read -r -d '' path; do 
+            node "src/sort-vscode-settings.js" "$path";
+        done
+}
+
+function harmonise {
+    sort_vscode_settings
+}
+
+harmonise
