@@ -1,14 +1,21 @@
 #!/bin/bash
 
+NORM=$(tput sgr0)
+BOLD=$(tput bold)
+
 function install {
-    targets="targets"
-    node "src/sort-vscode-settings.js" "$targets/Library/Application Support/Code/User/settings.json";
-    find "$targets" -type f -print0 | 
+    local profile="${1:-default}"    
+    local target="profiles/$profile"
+
+    echo "Installing $BOLD$profile$NORM profile..."
+    echo
+
+    find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
-            echo "$(pwd)/$path" "$HOME/${path#*/}"
-            ln -sf "$(pwd)/$path" "$HOME/${path#*/}"
+            ln -sfv "$(pwd)/$path" "$HOME${path#"$target"}"
         done
 }
 
-install
+install "$@"
+echo
 echo "done"
