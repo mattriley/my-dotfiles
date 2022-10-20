@@ -4,6 +4,8 @@
 source "$HOME/.bashrc"
 source "$HOME/.hostvars"
 
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
