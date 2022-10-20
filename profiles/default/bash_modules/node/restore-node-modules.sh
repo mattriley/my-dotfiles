@@ -11,8 +11,8 @@ function node.restore_node_modules {
 
     [[ ${#array[@]} -ne 1 ]] && echo "Absent or ambiguous source directory" && return 1
 
-    # local source_root="${array[0]}"
-    local source_root="$array" # first match
+    local source_root="${array[0]}"
+    # local source_root="$array" # first match
 
     find "$source_root"/*/node_modules -maxdepth 0 -type d -print0 | 
         while IFS= read -r -d '' source; do 
