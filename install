@@ -12,7 +12,9 @@ function install {
 
     find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
-            ln -sfv "$(pwd)/$path" "$HOME${path#"$target"}"
+            local dest="$HOME${path#"$target"}"
+            mkdir -p "$(dirname "$dest")"
+            ln -sfv "$(pwd)/$path" "$dest"
         done
 
     echo

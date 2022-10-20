@@ -84,3 +84,11 @@ function restore_node_modules {
         done
 
 }
+
+
+
+for module_path in "$HOME/bash_modules"/*; do
+    for script_path in "$module_path"/*.sh; do
+        source "$script_path"
+    done
+done
