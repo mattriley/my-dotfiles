@@ -2,7 +2,7 @@
 
 function sort_vscode_settings {
 
-    find src/bash/profiles/*/Library/"Application Support"/Code/*/settings.json -type f -print0 | 
+    find "src/bash/profiles/"*"/Library/Application Support/Code/"*"/settings.json" -type f -print0 | 
         while IFS= read -r -d '' path; do 
             node "src/node/sort-vscode-settings.js" "$path";
         done
