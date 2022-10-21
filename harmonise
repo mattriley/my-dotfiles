@@ -1,9 +1,9 @@
 #!/bin/bash
 
 function sort_vscode_settings {
-    find profiles/*/Library/"Application Support"/Code/*/settings.json -type f -print0 | 
+    find src/bash/profiles/*/Library/"Application Support"/Code/*/settings.json -type f -print0 | 
         while IFS= read -r -d '' path; do 
-            node "src/sort-vscode-settings.js" "$path";
+            node "src/node/sort-vscode-settings.js" "$path";
         done
 }
 

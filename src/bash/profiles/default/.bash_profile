@@ -11,8 +11,9 @@ export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
 export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
 export CODE_DIR="$HOME/Home/Code"
+export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
 
-for module_path in "$HOME/bash_modules"/*; do
+for module_path in "$BASH_MODULES/"*; do
     for script_path in "$module_path"/*.sh; do
         source "$script_path"
     done
