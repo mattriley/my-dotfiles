@@ -6,15 +6,17 @@ source "$HOME/.hostvars"
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
+export CODE_DIR="$HOME/Home/Code"
+export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
+export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
+
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
-export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
-export CODE_DIR="$HOME/Home/Code"
-export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
+export MY_PHOTOS="$HOME/Home/Photos • Matt"
 
 for module_path in "$BASH_MODULES/"*; do
-    for script_path in "$module_path"/*.sh; do
+    for script_path in "$module_path/"*.sh; do
         source "$script_path"
     done
 done
@@ -33,4 +35,3 @@ function t {
 
 node.setup_nvm
 display.4k
-source "$HOME/.bash_profile_extended"
