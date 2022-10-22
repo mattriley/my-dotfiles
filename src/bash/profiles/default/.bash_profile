@@ -4,16 +4,19 @@
 source "$HOME/.bashrc"
 source "$HOME/.hostvars"
 
+export PATH=/opt/homebrew/bin:$PATH
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-export CODE_DIR="$HOME/Home/Code"
+export HOME_DIR="$HOME/Home"
+export TEMP_DIR="$HOME_DIR/.temp"
+export CODE_DIR="$HOME_DIR/Code"
 export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
 export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
 
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
-export MY_PHOTOS="$HOME/Home/Photos • Matt"
+export MY_PHOTOS="$HOME_DIR/Photos • Matt"
 
 for module_path in "$BASH_MODULES/"*; do
     for script_path in "$module_path/"*.sh; do

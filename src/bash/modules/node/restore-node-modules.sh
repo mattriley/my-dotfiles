@@ -3,11 +3,12 @@
 function node.restore_node_modules {
 
     local code_dir=${1:-$CODE_DIR}
+    local temp_dir=${2:-$TEMP_DIR}
     local array=()
 
     while IFS=  read -r match; do
         array+=("$match")
-    done < <(find "$code_dir"/*_extracted_node_modules -maxdepth 0 -type d)
+    done < <(find "$temp_dir"/*_extracted_node_modules -maxdepth 0 -type d)
 
     [[ ${#array[@]} -ne 1 ]] && echo "Absent or ambiguous source directory" && return 1
 
@@ -17,7 +18,9 @@ function node.restore_node_modules {
         while IFS= read -r -d '' source; do 
             local dest="$code_dir${source#"$source_root"}"
             dest=${dest//\/node_modules/}
-            mv -v "$source" "$dest"
+            mv -v "$source" "$dest" && rmdir "$(dirname "$source")"
         done
+
+    rmdir "$source_root"
 
 }
