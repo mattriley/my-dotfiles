@@ -24,6 +24,10 @@ for module_path in "$BASH_MODULES/"*; do
     done
 done
 
+function prompt.dev {
+    export PS1="\[\033[01;35m\]\u@\h:\[\033[01;34m\]\$(git.parse_git_branch) \[\033[01;32m\]\w \[\033[01;34m\]\n>\[\e[0m\]"
+}
+
 function display.4k {
     export ITERMOCIL_LAYOUT="even-vertical"
 }
@@ -36,5 +40,6 @@ function t {
     npx -p "task-library" task "$@"
 }
 
-node.setup_nvm
+prompt.dev
 display.4k
+node.setup_nvm
