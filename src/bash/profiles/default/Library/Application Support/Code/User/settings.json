@@ -8,7 +8,7 @@
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "aws.profile": "profile:matthewriley",
+    "aws.profile": "profile:mattriley",
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.acceptSuggestionOnEnter": "on",
     "editor.autoClosingBrackets": "never",
@@ -69,5 +69,6 @@
     "window.commandCenter": true,
     "window.zoomLevel": 1,
     "workbench.editor.enablePreview": false,
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true
 }
