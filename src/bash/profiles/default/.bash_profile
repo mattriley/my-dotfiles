@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1090,SC1091
+# shellcheck disable=SC1090,SC1091,SC2155
 
 source "$HOME/.bashrc"
 source "$HOME/.hostvars"
@@ -18,14 +18,27 @@ export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
 export MY_PHOTOS="$HOME_DIR/Photos • Matt"
 
+export NORM=$(tput sgr0)
+export BOLD=$(tput bold)
+export RED=$(tput setaf 1)
+export GREEN=$(tput setaf 2)
+export YELLOW=$(tput setaf 3)
+export BLUE=$(tput setaf 4)
+export MAGENTA=$(tput setaf 5)
+
 for module_path in "$BASH_MODULES/"*; do
     for script_path in "$module_path/"*.sh; do
         source "$script_path"
     done
 done
 
+function prompt.git_branch {
+    local branch="$(git.parse_git_branch)"
+    [ "$branch" ] && echo " $branch"
+}
+
 function prompt.dev {
-    export PS1="\[\033[01;35m\]\u@\h:\[\033[01;34m\]\$(git.parse_git_branch) \[\033[01;32m\]\w \[\033[01;34m\]>\[\e[0m\]"
+    export PS1="${BOLD}${GREEN}\w${NORM}${BOLD}${BLUE}\$(prompt.git_branch)${NORM} ${BOLD}>${NORM} "
 }
 
 function display.4k {
