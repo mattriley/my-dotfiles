@@ -38,7 +38,7 @@ function prompt.git_branch {
 }
 
 function prompt.dev {
-    export PS1="${BOLD}${GREEN}\w${NORM}${BOLD}${BLUE}\$(prompt.git_branch)${NORM} ${BOLD}>${NORM} "
+    export PS1="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]>\[${NORM}\] "
 }
 
 function display.4k {
