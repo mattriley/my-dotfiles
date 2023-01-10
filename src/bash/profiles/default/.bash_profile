@@ -2,7 +2,9 @@
 # shellcheck disable=SC1090,SC1091,SC2155
 
 source "$HOME/.bashrc"
-source "$HOME/.hostvars"
+
+export HOSTVARS="$HOME/.hostvars"
+touch "$HOSTVARS" && source "$HOSTVARS"
 
 export PATH=/opt/homebrew/bin:$PATH
 export BASH_SILENCE_DEPRECATION_WARNING=1
