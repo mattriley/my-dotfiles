@@ -59,4 +59,4 @@ function t {
 
 prompt.dev
 display.4k
-node.setup_nvm
+node.nvm.setup
