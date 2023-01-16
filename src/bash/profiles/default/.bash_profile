@@ -14,6 +14,7 @@ export TEMP_DIR="$HOME_DIR/.temp"
 export CODE_DIR="$HOME_DIR/Code"
 export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
 export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
+export VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
 
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
