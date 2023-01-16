@@ -8,7 +8,6 @@
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "aws.profile": "profile:mattriley",
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.acceptSuggestionOnEnter": "on",
     "editor.autoClosingBrackets": "never",
