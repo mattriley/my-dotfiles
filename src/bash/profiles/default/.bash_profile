@@ -14,6 +14,8 @@ export TEMP_DIR="$HOME_DIR/.temp"
 export CODE_DIR="$HOME_DIR/Code"
 export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
 export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
+export ITERMOCIL_LAYOUT_HIGHRES="even-vertical"
+export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_DEFAULT"
 export VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
 
 export MY_AUTHOR_NAME="Matt Riley"
@@ -31,34 +33,16 @@ export YELLOW=$(tput setaf 3)
 export BLUE=$(tput setaf 4)
 export MAGENTA=$(tput setaf 5)
 
+export DEV_PROMPT="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]$\[${NORM}\]"
+
 for module_path in "$BASH_MODULES/"*; do
     for script_path in "$module_path/"*.sh; do
         source "$script_path"
     done
 done
 
-function prompt.git_branch {
-    local branch="$(git.parse_git_branch)"
-    [ "$branch" ] && echo " $branch"
-}
-
-function prompt.dev {
-    export PS1="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]$\[${NORM}\]"
-}
-
-function display.4k {
-    export ITERMOCIL_LAYOUT="even-vertical"
-}
-
-function display.default {
-    export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_DEFAULT"
-}
-
-function t {
-    npx -p "task-library" task "$@"
-}
-
+function t { npx -p "task-library" task "$@"; }
+display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 prompt.dev
-display.4k
-# node.nvm.setup
 node.nodenv.setup
+# node.nvm.setup
