@@ -44,5 +44,5 @@ done
 function t { npx -p "task-library" task "$@"; }
 display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 prompt.dev
+node.nvm.setup
 node.nodenv.setup
-# node.nvm.setup
