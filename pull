@@ -1,0 +1,24 @@
+#!/bin/bash
+
+NORM=$(tput sgr0)
+BOLD=$(tput bold)
+
+function pull {
+    local profile="$1"    
+    local target="src/bash/profiles/$profile"
+
+    echo "Pulling $BOLD$profile$NORM profile..."
+    echo
+
+    find "$target" -type f -print0 | 
+        while IFS= read -r -d '' path; do 
+            local dest="$HOME${path#"$target"}"
+            [ ! -L "$dest" ] && cp "$dest" "$(pwd)/$path"
+        done
+
+    echo
+}
+
+echo
+pull "default"
+[ "$1" ] && pull "$1" 
