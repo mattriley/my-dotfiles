@@ -17,8 +17,8 @@ export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
 export ITERMOCIL_LAYOUT_HIGHRES="even-vertical"
 export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_DEFAULT"
 
-# this was the problem...
-export _VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
+# WARNING: Naming this VSCODE_EXTENSIONS will conflict and cause side effects with VSCode.
+export MY_VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
 
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
