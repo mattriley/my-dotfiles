@@ -54,6 +54,7 @@
     },
     "files.autoSave": "onFocusChange",
     "files.insertFinalNewline": true,
+    "git.openRepositoryInParentFolders": "never",
     "javascript.preferences.useAliasesForRenames": false,
     "javascript.suggest.autoImports": false,
     "javascript.updateImportsOnFileMove.enabled": "never",
@@ -64,9 +65,9 @@
         "markdown": "Default Light+",
         "javascript": "Default Dark+"
     },
-    "window.commandCenter": true,
-    "workbench.editor.enablePreview": false,
-    "workbench.iconTheme": "vscode-icons",
     "vsicons.dontShowNewVersionMessage": true,
-    "window.zoomLevel": 1
+    "window.commandCenter": true,
+    "window.zoomLevel": 1,
+    "workbench.editor.enablePreview": false,
+    "workbench.iconTheme": "vscode-icons"
 }
