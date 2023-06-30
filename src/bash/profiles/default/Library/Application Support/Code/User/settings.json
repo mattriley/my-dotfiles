@@ -67,7 +67,8 @@
     },
     "vsicons.dontShowNewVersionMessage": true,
     "window.commandCenter": true,
-    "window.zoomLevel": 1,
     "workbench.editor.enablePreview": false,
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "window.zoomLevel": 1
 }
