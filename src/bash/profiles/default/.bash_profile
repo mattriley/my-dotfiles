@@ -35,7 +35,10 @@ export YELLOW=$(tput setaf 3)
 export BLUE=$(tput setaf 4)
 export MAGENTA=$(tput setaf 5)
 
-export DEV_PROMPT="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]$\[${NORM}\]"
+# export DEV_PROMPT="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]$\[${NORM}\]"
+
+# Customizing the prompt
+export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 
 for module_path in "$BASH_MODULES/"*; do
     for script_path in "$module_path/"*.sh; do
