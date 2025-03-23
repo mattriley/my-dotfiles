@@ -6,7 +6,6 @@ source "$HOME/.bashrc"
 export HOSTVARS="$HOME/.hostvars"
 touch "$HOSTVARS" && source "$HOSTVARS"
 
-export PATH=/opt/homebrew/bin:$PATH
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 export HOME_DIR="$HOME/Home"
@@ -35,9 +34,6 @@ export YELLOW=$(tput setaf 3)
 export BLUE=$(tput setaf 4)
 export MAGENTA=$(tput setaf 5)
 
-# export DEV_PROMPT="\[${BOLD}${GREEN}\]\w\[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[${NORM} ${BOLD}\]$\[${NORM}\]"
-
-# Customizing the prompt
 export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 
 for module_path in "$BASH_MODULES/"*; do
