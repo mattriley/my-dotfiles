@@ -1,6 +1,14 @@
 #!/bin/bash
 # shellcheck disable=SC1090,SC1091,SC2155
 
+# Check if the shell is Bash
+if [ -n "$BASH_VERSION" ]; then
+    echo "Shell is Bash"
+else
+    echo "Shell is not Bash"
+    return
+fi
+
 source "$HOME/.bashrc"
 
 export HOSTVARS="$HOME/.hostvars"
@@ -47,3 +55,4 @@ display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 prompt.dev
 node.nvm.setup
 node.nodenv.setup
+

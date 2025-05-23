@@ -1,0 +1,18 @@
+{
+    "Profiles": [
+        {
+            "Name": "Matt Riley",
+            "Guid": "1d0710f9-a566-46ee-8710-fe0b46619ce2",
+            "Scrollback Lines": 0,
+            "Prompt Before Closing": false,
+            "Command": "\/bin\/bash",
+            "Custom Command": "Custom Shell",
+            "Transparency": 0,
+            "Custom Directory": "Yes",
+            "Working Directory": "\/Users\/mattriley\/Home\/Code",
+            "Unlimited Scrollback": true,
+            "Use Separate Colors for Light and Dark Mode": true,
+            "Shortcut": "M"
+        }
+    ]
+}
