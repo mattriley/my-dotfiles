@@ -12,7 +12,12 @@
             "Working Directory": "\/Users\/mattriley\/Home\/Code",
             "Unlimited Scrollback": true,
             "Use Separate Colors for Light and Dark Mode": true,
-            "Shortcut": "M"
+            "Shortcut": "M",
+            "Semantic History": {
+                "text": "",
+                "action": "editor",
+                "editor": "com.microsoft.VSCode"
+            }
         }
     ]
 }
