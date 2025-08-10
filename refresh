@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function sort_vscode_settings {
+    find "src/bash/profiles/"*"/Library/Application Support/Code/"*"/settings.json" -type f -print0 | 
+        while IFS= read -r -d '' path; do 
+            node "src/node/sort-vscode-settings.js" "$path";
+        done
+}
+
+function set_git_author {
+    git config --global user.name "$MY_AUTHOR_NAME"
+    git config --global user.email "$MY_AUTHOR_EMAIL"
+}
+
+function set_screencapture_location {
+    if [ -d "$SCREENCAPTURE_DIR" ]; then
+        defaults write com.apple.screencapture location "$SCREENCAPTURE_DIR"
+        killall SystemUIServer
+        echo "Screenshot location set to $SCREENCAPTURE_DIR"
+    else
+        echo "Error: Directory $SCREENCAPTURE_DIR does not exist"
+    fi
+}
+
+./install-shell-profile
+sort_vscode_settings
+set_git_author
+set_screencapture_location

@@ -3,7 +3,7 @@
 NORM=$(tput sgr0)
 BOLD=$(tput bold)
 
-function pull {
+function pull_shell_profile {
     local profile="$1"    
     local target="src/bash/profiles/$profile"
 
@@ -20,5 +20,5 @@ function pull {
 }
 
 echo
-pull "default"
-[ "$1" ] && pull "$1" 
+pull_shell_profile "default"
+[ "$1" ] && pull_shell_profile "$1" 

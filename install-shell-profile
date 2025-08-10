@@ -3,7 +3,7 @@
 NORM=$(tput sgr0)
 BOLD=$(tput bold)
 
-function install {
+function install_shell_profile {
     local profile="$1"    
     local target="src/bash/profiles/$profile"
 
@@ -21,5 +21,5 @@ function install {
 }
 
 echo
-install "default"
-[ "$1" ] && install "$1" 
+install_shell_profile "default"
+[ "$1" ] && install_shell_profile "$1" 
