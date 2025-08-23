@@ -9,6 +9,8 @@ else
     return
 fi
 
+export NODE_OPTIONS="--max_old_space_size=16384"
+
 source "$HOME/.bashrc"
 
 export HOSTVARS="$HOME/.hostvars"
