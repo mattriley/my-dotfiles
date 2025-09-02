@@ -9,7 +9,7 @@ else
     return
 fi
 
-export NODE_OPTIONS="--max_old_space_size=16384"
+export NODE_OPTIONS="--max_old_space_size=32768"
 export UV_THREADPOOL_SIZE=80
 
 source "$HOME/.bashrc"
