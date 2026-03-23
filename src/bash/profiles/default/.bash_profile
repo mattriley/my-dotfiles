@@ -34,7 +34,7 @@ export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"
 export MY_PHOTOS="$HOME_DIR/Photos \\ Matt"
-export PHOTOS_PARTIAL_PATH="$HOME_DIR/Photos \\"
+export PHOTOS_PARTIAL_PATH="$HOME_DIR/Photos \\ "
 export PHOTOS_DEFAULT_PROFILE="Matt"
 export SCREENCAPTURE_DIR="$HOME_DIR/Screenshots"
 
