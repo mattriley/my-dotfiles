@@ -1,6 +1,11 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
+if ! declare -f util.has_command >/dev/null 2>&1; then
+    # shellcheck disable=SC1090,SC1091
+    source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../util" && pwd)/common.sh"
+fi
+
 function node.collect_project_node_modules {
 
     local code_dir="$1"
@@ -27,8 +32,8 @@ function node.collect_extracted_node_modules_roots {
 
 function node.require_install_tools {
 
-    command -v curl >/dev/null 2>&1 || return 1
-    command -v bash >/dev/null 2>&1 || return 1
+    util.has_command curl || return 1
+    util.has_command bash || return 1
 
 }
 
