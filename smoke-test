@@ -78,6 +78,154 @@ run_zsh_profile() {
   HOME="$tmp_home" zsh "$@" 2>&1
 }
 
+assert_bash_profile_noninteractive_clean() {
+  local tmp_home
+  local out
+
+  echo "OK: .bash_profile degrades cleanly when modules are unavailable"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "bash"
+  out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
+  rm -rf "$tmp_home"
+  expect_not_contains "$out" "command not found" ".bash_profile should not call missing helper functions"
+  expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
+}
+
+assert_bash_profile_loads_modules() {
+  local tmp_home
+  local out
+
+  echo "OK: configured BASH_MODULES loads repo modules"
+  tmp_home="$(make_temp_home)"
+  ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit')"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "prompt_loaded" "configured BASH_MODULES should load repo modules"
+  expect_contains "$out" "nvm_loaded" "configured BASH_MODULES should load repo modules"
+}
+
+assert_bash_profile_unset_dotfiles_dir_quiet() {
+  local tmp_home
+  local out
+
+  echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
+  tmp_home="$(make_temp_home)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+unset DOTFILES_DIR
+EOF
+  out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
+  rm -rf "$tmp_home"
+  expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
+}
+
+assert_bash_profile_invalid_dotfiles_dir_warns() {
+  local tmp_home
+  local out
+
+  echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
+  tmp_home="$(make_temp_home)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+export DOTFILES_DIR="/no/such/dotfiles"
+EOF
+  out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c exit)"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .bash_profile should warn on invalid DOTFILES_DIR"
+}
+
+assert_bash_profile_idempotent() {
+  local tmp_home
+  local out
+
+  echo "OK: .bash_profile is idempotent when sourced twice"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "bash"
+  # shellcheck disable=SC2016
+  out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit')"
+  rm -rf "$tmp_home"
+  expect_line_count "$out" '^Shell: bash$' 1 ".bash_profile should only initialize once"
+  expect_contains "$out" "loaded:1" ".bash_profile should only initialize once"
+}
+
+assert_zsh_profile_noninteractive_clean() {
+  local tmp_home
+  local out
+
+  echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"')"
+  rm -rf "$tmp_home"
+  expect_not_contains "$out" "command not found" ".zshrc should not require missing helper functions"
+  expect_not_contains "$out" "Shell: zsh" ".zshrc should stay quiet in non-interactive shells"
+}
+
+assert_zsh_profile_loads_modules() {
+  local tmp_home
+  local out
+
+  echo "OK: .zshrc loads shared shell modules"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?')"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "gs:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "gr:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "prompt_dev:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "git_parse:0" ".zshrc should load shared shell modules"
+}
+
+assert_zsh_profile_applies_prompt() {
+  local tmp_home
+  local out
+
+  echo "OK: interactive .zshrc applies prompt.dev"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -i -c 'print -r -- "$PS1"')"
+  rm -rf "$tmp_home"
+  # shellcheck disable=SC2016
+  expect_contains "$out" '$(prompt.git_branch) $ ' "interactive .zshrc should apply prompt.dev"
+}
+
+assert_zsh_profile_invalid_dotfiles_dir_warns() {
+  local tmp_home
+  local out
+
+  echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
+  tmp_home="$(make_temp_home)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+export DOTFILES_DIR="/no/such/dotfiles"
+export BASH_MODULES="$DOTFILES_DIR/src/bash/modules"
+EOF
+  out="$(run_zsh_profile "$tmp_home" -i -c exit)"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .zshrc should warn on invalid DOTFILES_DIR"
+}
+
+assert_zsh_profile_idempotent() {
+  local tmp_home
+  local out
+
+  echo "OK: .zshrc is idempotent when sourced twice"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"')"
+  rm -rf "$tmp_home"
+  expect_line_count "$out" '^Shell: zsh$' 1 ".zshrc should only initialize once"
+  expect_contains "$out" "loaded:1" ".zshrc should only initialize once"
+}
+
 shopt -s nullglob
 for module_path in "$MODULES_DIR/"*; do
   for script_path in "$module_path/"*.sh; do
@@ -233,104 +381,18 @@ out="$(
 )"
 expect_not_contains "$out" "Error: profile directory not found" "pull-shell-profile should expand --profile all"
 
-echo "OK: .bash_profile degrades cleanly when modules are unavailable"
-tmp_home="$(make_temp_home)"
-setup_temp_profile_home "$tmp_home" "bash"
-out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
-rm -rf "$tmp_home"
-expect_not_contains "$out" "command not found" ".bash_profile should not call missing helper functions"
-expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
+assert_bash_profile_noninteractive_clean
+assert_bash_profile_loads_modules
+assert_bash_profile_unset_dotfiles_dir_quiet
+assert_bash_profile_invalid_dotfiles_dir_warns
+assert_bash_profile_idempotent
 
-echo "OK: configured BASH_MODULES loads repo modules"
-tmp_home="$(make_temp_home)"
-ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit')"
-rm -rf "$tmp_home"
-expect_contains "$out" "prompt_loaded" "configured BASH_MODULES should load repo modules"
-expect_contains "$out" "nvm_loaded" "configured BASH_MODULES should load repo modules"
-
-echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
-tmp_home="$(make_temp_home)"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-cat > "$tmp_home/.bashrc" <<'EOF'
-#!/bin/bash
-unset DOTFILES_DIR
-EOF
-out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
-rm -rf "$tmp_home"
-expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
-
-echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
-tmp_home="$(make_temp_home)"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-cat > "$tmp_home/.bashrc" <<'EOF'
-#!/bin/bash
-export DOTFILES_DIR="/no/such/dotfiles"
-EOF
-out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c exit)"
-rm -rf "$tmp_home"
-expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .bash_profile should warn on invalid DOTFILES_DIR"
-
-echo "OK: .bash_profile is idempotent when sourced twice"
-tmp_home="$(make_temp_home)"
-setup_temp_profile_home "$tmp_home" "bash"
-# shellcheck disable=SC2016
-out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit')"
-rm -rf "$tmp_home"
-expect_line_count "$out" '^Shell: bash$' 1 ".bash_profile should only initialize once"
-expect_contains "$out" "loaded:1" ".bash_profile should only initialize once"
-
-  echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
-  if command -v zsh >/dev/null 2>&1; then
-  tmp_home="$(make_temp_home)"
-  setup_temp_profile_home "$tmp_home" "zsh"
-  # shellcheck disable=SC2016
-  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"')"
-  rm -rf "$tmp_home"
-  expect_not_contains "$out" "command not found" ".zshrc should not require missing helper functions"
-  expect_not_contains "$out" "Shell: zsh" ".zshrc should stay quiet in non-interactive shells"
-
-  echo "OK: .zshrc loads shared shell modules"
-  tmp_home="$(make_temp_home)"
-  setup_temp_profile_home "$tmp_home" "zsh"
-  # shellcheck disable=SC2016
-  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?')"
-  rm -rf "$tmp_home"
-  expect_contains "$out" "gs:0" ".zshrc should load shared shell modules"
-  expect_contains "$out" "gr:0" ".zshrc should load shared shell modules"
-  expect_contains "$out" "prompt_dev:0" ".zshrc should load shared shell modules"
-  expect_contains "$out" "git_parse:0" ".zshrc should load shared shell modules"
-
-  echo "OK: interactive .zshrc applies prompt.dev"
-  tmp_home="$(make_temp_home)"
-  setup_temp_profile_home "$tmp_home" "zsh"
-  # shellcheck disable=SC2016
-  out="$(run_zsh_profile "$tmp_home" -i -c 'print -r -- "$PS1"')"
-  rm -rf "$tmp_home"
-  # shellcheck disable=SC2016
-  expect_contains "$out" '$(prompt.git_branch) $ ' "interactive .zshrc should apply prompt.dev"
-
-  echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
-  tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
-  cat > "$tmp_home/.bashrc" <<'EOF'
-#!/bin/bash
-export DOTFILES_DIR="/no/such/dotfiles"
-export BASH_MODULES="$DOTFILES_DIR/src/bash/modules"
-EOF
-  out="$(run_zsh_profile "$tmp_home" -i -c exit)"
-  rm -rf "$tmp_home"
-  expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .zshrc should warn on invalid DOTFILES_DIR"
-
-  echo "OK: .zshrc is idempotent when sourced twice"
-  tmp_home="$(make_temp_home)"
-  setup_temp_profile_home "$tmp_home" "zsh"
-  # shellcheck disable=SC2016
-  out="$(run_zsh_profile "$tmp_home" -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"')"
-  rm -rf "$tmp_home"
-  expect_line_count "$out" '^Shell: zsh$' 1 ".zshrc should only initialize once"
-  expect_contains "$out" "loaded:1" ".zshrc should only initialize once"
+if command -v zsh >/dev/null 2>&1; then
+  assert_zsh_profile_noninteractive_clean
+  assert_zsh_profile_loads_modules
+  assert_zsh_profile_applies_prompt
+  assert_zsh_profile_invalid_dotfiles_dir_warns
+  assert_zsh_profile_idempotent
 else
   echo "SKIP: zsh is not installed"
 fi
