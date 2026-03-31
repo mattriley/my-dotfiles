@@ -12,17 +12,31 @@ fi
 
 export DOTFILES_BASH_PROFILE_LOADED=1
 
-case $- in
-    *i*) is_interactive=1 ;;
-    *) is_interactive=0 ;;
-esac
-
-[ "$is_interactive" -eq 1 ] && echo "Shell: bash"
-
 export NODE_OPTIONS="--max_old_space_size=32768"
 export UV_THREADPOOL_SIZE=80
 
 source "$HOME/.bashrc"
+
+if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then
+    source "$DOTFILES_DIR/src/bash/profile-common.sh"
+fi
+
+is_interactive=0
+if declare -f dotfiles.is_interactive >/dev/null 2>&1; then
+    if dotfiles.is_interactive; then
+        is_interactive=1
+    fi
+else
+    case $- in
+        *i*) is_interactive=1 ;;
+    esac
+fi
+
+if declare -f dotfiles.print_shell_banner >/dev/null 2>&1; then
+    dotfiles.print_shell_banner "$is_interactive" "bash"
+elif [ "$is_interactive" -eq 1 ]; then
+    echo "Shell: bash"
+fi
 
 # Local overrides (optional)
 [ -f "$HOME/.bash_profile.local" ] && source "$HOME/.bash_profile.local"
@@ -91,30 +105,20 @@ fi
 
 export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 
-if [ -d "$BASH_MODULES" ]; then
-    shopt -s nullglob
-    for module_path in "$BASH_MODULES/"*; do
-        for script_path in "$module_path/"*.sh; do
-            source "$script_path"
-        done
-    done
-    shopt -u nullglob
+if declare -f dotfiles.load_modules >/dev/null 2>&1; then
+    dotfiles.load_modules
 fi
 
 function t { npx -p "task-library" task "$@"; }
 
-if declare -f display.is-highres >/dev/null 2>&1; then
+if declare -f dotfiles.has_function >/dev/null 2>&1 && dotfiles.has_function "display.is-highres"; then
     display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 fi
 
-if [ "$is_interactive" -eq 1 ] && declare -f prompt.dev >/dev/null 2>&1; then
-    prompt.dev
+if declare -f dotfiles.apply_prompt >/dev/null 2>&1; then
+    dotfiles.apply_prompt "$is_interactive"
 fi
 
-if declare -f node.nvm.setup >/dev/null 2>&1; then
-    node.nvm.setup
-fi
-
-if declare -f node.nodenv.setup >/dev/null 2>&1; then
-    node.nodenv.setup
+if declare -f dotfiles.setup_node >/dev/null 2>&1; then
+    dotfiles.setup_node
 fi

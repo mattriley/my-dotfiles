@@ -271,7 +271,7 @@ tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
 out="$(
-  HOME="$tmp_home" bash --rcfile "$tmp_home/.bash_profile" -i -c 'source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit' 2>&1
+  HOME="$tmp_home" bash --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit' 2>&1
 )"
 rm -rf "$tmp_home"
 if [ "$(printf '%s\n' "$out" | grep -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
@@ -346,7 +346,7 @@ EOF
   cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
   out="$(
-    HOME="$tmp_home" zsh -i -c 'source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"' 2>&1
+    HOME="$tmp_home" zsh -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"' 2>&1
   )"
   rm -rf "$tmp_home"
   if [ "$(printf '%s\n' "$out" | grep -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then

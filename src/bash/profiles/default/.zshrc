@@ -12,35 +12,45 @@ fi
 
 export DOTFILES_ZSHRC_LOADED=1
 
-case $- in
-    *i*) is_interactive=1 ;;
-    *) is_interactive=0 ;;
-esac
-
-[ "$is_interactive" -eq 1 ] && echo "Shell: zsh"
-
 if [ -z "${DOTFILES_DIR:-}" ]; then
-    [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR is not set" >&2
+    case $- in
+        *i*) echo "Error: DOTFILES_DIR is not set" >&2 ;;
+    esac
 elif [ ! -d "$DOTFILES_DIR" ]; then
-    [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
+    case $- in
+        *i*) echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2 ;;
+    esac
 fi
 
-# Load shared shell modules when the repo path is configured.
-if [ -d "${BASH_MODULES:-}" ]; then
-    setopt local_options null_glob
-    for script_path in "$BASH_MODULES"/*/*.sh; do
-        source "$script_path"
-    done
+if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then
+    source "$DOTFILES_DIR/src/bash/profile-common.sh"
 fi
 
-if whence node.nvm.setup >/dev/null 2>&1; then
-    node.nvm.setup
+is_interactive=0
+if whence dotfiles.is_interactive >/dev/null 2>&1; then
+    if dotfiles.is_interactive; then
+        is_interactive=1
+    fi
+else
+    case $- in
+        *i*) is_interactive=1 ;;
+    esac
 fi
 
-if whence node.nodenv.setup >/dev/null 2>&1; then
-    node.nodenv.setup
+if whence dotfiles.print_shell_banner >/dev/null 2>&1; then
+    dotfiles.print_shell_banner "$is_interactive" "zsh"
+elif [ "$is_interactive" -eq 1 ]; then
+    echo "Shell: zsh"
 fi
 
-if [ "$is_interactive" -eq 1 ] && whence prompt.dev >/dev/null 2>&1; then
-    prompt.dev
+if whence dotfiles.load_modules >/dev/null 2>&1; then
+    dotfiles.load_modules
+fi
+
+if whence dotfiles.setup_node >/dev/null 2>&1; then
+    dotfiles.setup_node
+fi
+
+if whence dotfiles.apply_prompt >/dev/null 2>&1; then
+    dotfiles.apply_prompt "$is_interactive"
 fi
