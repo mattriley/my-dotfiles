@@ -1,7 +1,12 @@
 #!/bin/bash
 
-NORM=$(tput sgr0)
-BOLD=$(tput bold)
+if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
+    NORM=$(tput sgr0)
+    BOLD=$(tput bold)
+else
+    NORM=""
+    BOLD=""
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
