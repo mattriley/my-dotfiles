@@ -15,17 +15,17 @@ To switch iTerm back to bash:
 
 ## Usage
 ### Dependency bootstrap
-Run `./install-dependencies` to install the small set of external tools this repo expects for validation and maintenance. The script is rerunnable and skips packages that are already installed.
+Run `./install_dependencies` to install the small set of external tools this repo expects for validation and maintenance. The script is rerunnable and skips packages that are already installed.
 
 ### Validation
-Run `./smoke-test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
+Run `./smoke_test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
 
 ### Profile planning
-Use `./install-shell-profile --list` or `./install-shell-profile --plan` to see which files would be symlinked into `$HOME`.
+Use `./install_shell_profile --list` or `./install_shell_profile --plan` to see which files would be symlinked into `$HOME`.
 
-Use `./pull-shell-profile --list` or `./pull-shell-profile --plan` to see which files would be copied back into `src/`.
+Use `./pull_shell_profile --list` or `./pull_shell_profile --plan` to see which files would be copied back into `src/`.
 
-Use `--profile all` with `install-shell-profile`, `pull-shell-profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
+Use `--profile all` with `install_shell_profile`, `pull_shell_profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
 
 ## Configuration
 The managed profiles currently set:
@@ -33,7 +33,7 @@ The managed profiles currently set:
 - `BASH_MODULES=$DOTFILES_DIR/src/bash/modules`
 - `.bash_profile` requires `.bashrc`; bash initialization lives in `.bashrc`, while `.bash_profile` is only the login-shell wrapper
 - `.zprofile` requires `.zshrc`; zsh initialization lives in `.zshrc`, while `.zprofile` is only the login-shell wrapper
-- personal machine/user defaults live in [dotfiles-personal.sh](/Users/mattriley/Home/Code/my-dotfiles/dotfiles-personal.sh)
+- personal machine/user defaults live in [dotfiles_personal.sh](/Users/mattriley/Home/Code/my-dotfiles/dotfiles_personal.sh)
 
 If the repository path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load shared modules from the correct location.
 
@@ -41,7 +41,7 @@ If the repository path changes, update [src/bash/profiles/default/.bashrc](/User
 GitHub Actions runs:
 - `shellcheck`
 - shell syntax validation with `bash -n` and `zsh -n`
-- `./smoke-test`
+- `./smoke_test`
 
 These checks run on every push and pull request.
 
@@ -59,7 +59,7 @@ These checks run on every push and pull request.
 - Share behavior before adding variants. If bash and zsh, or install and pull, need the same logic, consolidate it before making shell-specific tweaks.
 - Preserve behavior while simplifying structure. Broad refactors should reduce duplication without changing user-visible output unless that change is intentional and tested.
 - Refactor toward declarative tests. As coverage grows, prefer reusable test helpers over long procedural test blocks.
-- Back changes with checks. If a bug or regression matters, add or extend `smoke-test` so the behavior is enforced automatically.
+- Back changes with checks. If a bug or regression matters, add or extend `smoke_test` so the behavior is enforced automatically.
 - Keep shell code lint-clean. Treat `shellcheck` warnings as design feedback, not just formatting noise.
 
 ## Coding Standards
@@ -67,13 +67,13 @@ These checks run on every push and pull request.
 - Prefer small shell functions with one clear responsibility.
 - Keep top-level scripts readable from top to bottom: parse arguments, define helpers, run the main flow.
 - Name shared helpers by domain to make ownership obvious: `dotfiles.*`, `node.*`, `util.*`, `prompt.*`, and so on.
-- Use file naming to express load order inside module directories. The loader sources files alphabetically, so shared helpers should use names such as `00-common.sh`.
+- Use file naming to express load order inside module directories. The loader sources files alphabetically, so shared helpers should use names such as `00_common.sh`.
 - Guard shared-helper usage at bootstrap boundaries only. It is reasonable to check whether a shared file or bootstrap helper has loaded before first use in startup code.
 - Do not scatter repeated function-existence checks through normal control flow. Once a shared helper file is loaded, call its functions directly and treat missing helpers as a structural error.
 - Keep dependency assumptions explicit. If a file depends on shared module helpers, rely on documented loader order rather than hidden self-sourcing.
 - For action-style helpers, prefer an explicit base function plus a `.default` wrapper. The base function should take concrete arguments, while the `.default` wrapper may read matching values from the shell environment.
 - Prefer early returns over deep nesting in shell functions.
-- Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke-test` messages.
+- Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke_test` messages.
 - Prefer adding a shared helper over copying a block for the third time.
 - Keep test assertions direct and high-signal. Check externally observable behavior, not incidental implementation details.
 
@@ -110,4 +110,4 @@ These checks run on every push and pull request.
 - Quote here-doc delimiters when interpolation is not intended, for example `<<'EOF'`.
 - Guard optional `source` calls with `[ -f ... ]` or a shared helper so startup stays quiet.
 - Prefer shared helpers for repeated shell mechanics such as command checks or path mutation.
-- In module directories, rely on alphabetical load order and ordered filenames such as `00-common.sh` rather than per-file dependency guards.
+- In module directories, rely on alphabetical load order and ordered filenames such as `00_common.sh` rather than per-file dependency guards.

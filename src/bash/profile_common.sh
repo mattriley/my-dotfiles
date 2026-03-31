@@ -88,7 +88,7 @@ function dotfiles.export_profile_env {
     export NODE_OPTIONS="--max_old_space_size=32768"
     export UV_THREADPOOL_SIZE=80
     export BASH_SILENCE_DEPRECATION_WARNING=1
-    dotfiles.source_optional_file "$DOTFILES_DIR/dotfiles-personal.sh"
+    dotfiles.source_optional_file "$DOTFILES_DIR/dotfiles_personal.sh"
 }
 
 function dotfiles.setup_colors {

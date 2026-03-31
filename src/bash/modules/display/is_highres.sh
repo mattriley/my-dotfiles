@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function display.is-highres {
+function display.is_highres {
 
     util.has_command osascript || return 1
 

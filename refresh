@@ -3,13 +3,13 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
-source "$SCRIPT_DIR/src/bash/script-common.sh"
+source "$SCRIPT_DIR/src/bash/script_common.sh"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/src/bash/modules/git/set-author.sh"
+source "$SCRIPT_DIR/src/bash/modules/git/set_author.sh"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/src/bash/modules/macos/set-screencapture-location.sh"
+source "$SCRIPT_DIR/src/bash/modules/macos/set_screencapture_location.sh"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/src/bash/modules/vscode/sort-settings.sh"
+source "$SCRIPT_DIR/src/bash/modules/vscode/sort_settings.sh"
 
 dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@"
 parse_status=$?
@@ -18,14 +18,15 @@ parse_status=$?
 
 overall_status=0
 if [ "$DRY_RUN" -eq 1 ]; then
-    "$SCRIPT_DIR/install-shell-profile" --dry-run --profile "$PROFILE" || overall_status=1
+    "$SCRIPT_DIR/install_shell_profile" --dry-run --profile "$PROFILE" || overall_status=1
 else
-    "$SCRIPT_DIR/install-shell-profile" --profile "$PROFILE" || overall_status=1
+    "$SCRIPT_DIR/install_shell_profile" --profile "$PROFILE" || overall_status=1
 fi
 
 # Provide sane defaults when `refresh` is run outside a shell startup.
 : "${DOTFILES_DIR:=$SCRIPT_DIR}"
-[ -f "$DOTFILES_DIR/dotfiles-personal.sh" ] && source "$DOTFILES_DIR/dotfiles-personal.sh"
+# shellcheck disable=SC1091
+[ -f "$DOTFILES_DIR/dotfiles_personal.sh" ] && source "$DOTFILES_DIR/dotfiles_personal.sh"
 
 if [ "$DRY_RUN" -eq 0 ]; then
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1

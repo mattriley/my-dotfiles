@@ -13,8 +13,8 @@ fi
 export DOTFILES_ZSHRC_LOADED=1
 
 profile_common_loaded=0
-if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then
-    source "$DOTFILES_DIR/src/bash/profile-common.sh"
+if [ -f "$DOTFILES_DIR/src/bash/profile_common.sh" ]; then
+    source "$DOTFILES_DIR/src/bash/profile_common.sh"
     profile_common_loaded=1
 fi
 

@@ -272,7 +272,7 @@ require_func "util.trim"
 require_func "git.parse_git_branch"
 require_func "prompt.git_branch"
 require_func "prompt.dev"
-require_func "display.is-highres"
+require_func "display.is_highres"
 require_func "node.nvm.setup"
 require_func "node.nodenv.setup"
 require_func "node.extract_node_modules"
@@ -289,10 +289,10 @@ require_func "git.set_author"
 require_func "git.set_author.default"
 require_func "macos.set_screencapture_location"
 require_func "macos.set_screencapture_location.default"
-require_func "vscode.install-extensions"
-require_func "vscode.install-extensions.default"
+require_func "vscode.install_extensions"
+require_func "vscode.install_extensions.default"
 require_func "vscode.sort_settings"
-require_func "vscode.setup-shell-command"
+require_func "vscode.setup_shell_command"
 
 echo "OK: util.trim output"
 expect_eq "$(util.trim "  hi  ")" "hi" "util.trim produced unexpected output"
@@ -314,12 +314,12 @@ out="$(
     source "$1"
     cd "$2" || exit 1
     git init -q
-    git checkout -q -b smoke-test-branch
+    git checkout -q -b smoke_test_branch
     git.parse_git_branch
-  ' _ "$MODULES_DIR/git/parse-git-branch.sh" "$tmp_git_dir" 2>/dev/null
+  ' _ "$MODULES_DIR/git/parse_git_branch.sh" "$tmp_git_dir" 2>/dev/null
 )"
 rm -rf "$tmp_git_dir"
-expect_eq "$out" "(smoke-test-branch)" "git.parse_git_branch returned unexpected output"
+expect_eq "$out" "(smoke_test_branch)" "git.parse_git_branch returned unexpected output"
 
 echo "OK: flib.photos returns failure without exiting caller"
 out="$(
@@ -356,7 +356,7 @@ out="$(
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/node/00-common.sh" "$MODULES_DIR/node/extract-node-modules.sh" "$empty_code_dir" "$empty_temp_dir"
+  ' _ "$MODULES_DIR/node/00_common.sh" "$MODULES_DIR/node/extract_node_modules.sh" "$empty_code_dir" "$empty_temp_dir"
 )"
 rm -rf "$empty_code_dir" "$empty_temp_dir"
 expect_eq "$out" "status:0" "node.extract_node_modules should no-op cleanly"
@@ -372,7 +372,7 @@ out="$(
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/node/00-common.sh" "$MODULES_DIR/node/list-node-modules.sh" "$empty_code_dir"
+  ' _ "$MODULES_DIR/node/00_common.sh" "$MODULES_DIR/node/list_node_modules.sh" "$empty_code_dir"
 )"
 rm -rf "$empty_code_dir"
 expect_eq "$out" "status:0" "node.list_node_modules should no-op cleanly"
@@ -387,42 +387,42 @@ out="$(
 )"
 expect_contains "$out" 'gcu "$@" && git push' "git.push is not calling gcu"
 
-echo "OK: vscode.install-extensions no-ops when no extensions are configured"
+echo "OK: vscode.install_extensions.default no-ops when no extensions are configured"
 out="$(
   bash --noprofile --norc -c '
     source "$1"
     unset MY_VSCODE_EXTENSIONS
-    output="$(vscode.install-extensions.default 2>&1)"
+    output="$(vscode.install_extensions.default 2>&1)"
     if [ -n "$output" ]; then
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/vscode/install-extensions.sh"
+  ' _ "$MODULES_DIR/vscode/install_extensions.sh"
 )"
-expect_eq "$out" "status:0" "vscode.install-extensions.default should no-op cleanly"
+expect_eq "$out" "status:0" "vscode.install_extensions.default should no-op cleanly"
 
-echo "OK: vscode.install-extensions accepts an explicit extension list"
+echo "OK: vscode.install_extensions accepts an explicit extension list"
 out="$(
   bash --noprofile --norc -c '
     source "$1"
     util.has_command() { return 0; }
     code() { printf "code:%s\n" "$2"; }
-    vscode.install-extensions "foo.bar|baz.qux"
-  ' _ "$MODULES_DIR/vscode/install-extensions.sh"
+    vscode.install_extensions "foo.bar|baz.qux"
+  ' _ "$MODULES_DIR/vscode/install_extensions.sh"
 )"
-expect_eq "$out" $'code:foo.bar\ncode:baz.qux' "vscode.install-extensions should use explicit arguments when provided"
+expect_eq "$out" $'code:foo.bar\ncode:baz.qux' "vscode.install_extensions should use explicit arguments when provided"
 
-echo "OK: install-shell-profile supports --profile all in plan mode"
+echo "OK: install_shell_profile supports --profile all in plan mode"
 out="$(
-  bash --noprofile --norc "$SCRIPT_DIR/install-shell-profile" --list --profile all 2>&1
+  bash --noprofile --norc "$SCRIPT_DIR/install_shell_profile" --list --profile all 2>&1
 )"
-expect_not_contains "$out" "Error: profile directory not found" "install-shell-profile should expand --profile all"
+expect_not_contains "$out" "Error: profile directory not found" "install_shell_profile should expand --profile all"
 
-echo "OK: pull-shell-profile supports --profile all in plan mode"
+echo "OK: pull_shell_profile supports --profile all in plan mode"
 out="$(
-  bash --noprofile --norc "$SCRIPT_DIR/pull-shell-profile" --list --profile all 2>&1
+  bash --noprofile --norc "$SCRIPT_DIR/pull_shell_profile" --list --profile all 2>&1
 )"
-expect_not_contains "$out" "Error: profile directory not found" "pull-shell-profile should expand --profile all"
+expect_not_contains "$out" "Error: profile directory not found" "pull_shell_profile should expand --profile all"
 
 assert_bash_profile_noninteractive_clean
 assert_bash_profile_requires_bashrc

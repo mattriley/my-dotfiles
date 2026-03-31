@@ -79,4 +79,4 @@ elif [ "$package_manager" = "apt" ]; then
     ensure_dependencies "$package_manager" "${APT_DEPENDENCIES[@]}" || exit 1
 fi
 
-echo "install-dependencies: OK"
+echo "install_dependencies: OK"
