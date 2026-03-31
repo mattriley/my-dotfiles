@@ -2,6 +2,19 @@
 
 set -u
 
+# Format: "command_name:package_name"
+# This keeps the table generic when the executable and package names differ.
+BREW_DEPENDENCIES=(
+    "jq:jq"
+    "shellcheck:shellcheck"
+)
+
+APT_DEPENDENCIES=(
+    "jq:jq"
+    "shellcheck:shellcheck"
+    "zsh:zsh"
+)
+
 function has_command {
     command -v "$1" >/dev/null 2>&1
 }
@@ -41,18 +54,29 @@ function ensure_command {
     sudo apt-get install -y "$package_name"
 }
 
+function ensure_dependencies {
+    local package_manager="$1"
+    shift
+
+    local dependency
+    local command_name
+    local package_name
+    for dependency in "$@"; do
+        command_name="${dependency%%:*}"
+        package_name="${dependency#*:}"
+        ensure_command "$package_manager" "$command_name" "$package_name" || return 1
+    done
+}
+
 package_manager="$(detect_package_manager)" || {
     echo "Error: supported package manager not found (expected brew or apt-get)." >&2
     exit 1
 }
 
 if [ "$package_manager" = "brew" ]; then
-    ensure_command "$package_manager" jq jq || exit 1
-    ensure_command "$package_manager" shellcheck shellcheck || exit 1
+    ensure_dependencies "$package_manager" "${BREW_DEPENDENCIES[@]}" || exit 1
 elif [ "$package_manager" = "apt" ]; then
-    ensure_command "$package_manager" jq jq || exit 1
-    ensure_command "$package_manager" shellcheck shellcheck || exit 1
-    ensure_command "$package_manager" zsh zsh || exit 1
+    ensure_dependencies "$package_manager" "${APT_DEPENDENCIES[@]}" || exit 1
 fi
 
 echo "install-dependencies: OK"
