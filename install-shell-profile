@@ -1,49 +1,10 @@
 #!/bin/bash
 
-if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
-    NORM=$(tput sgr0)
-    BOLD=$(tput bold)
-else
-    NORM=""
-    BOLD=""
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/src/bash/script-common.sh"
 
-DRY_RUN=0
-LIST_ONLY=0
-PROFILE="default"
-
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --dry-run)
-            DRY_RUN=1
-            shift
-            ;;
-        --list|--plan)
-            DRY_RUN=1
-            LIST_ONLY=1
-            shift
-            ;;
-        --profile=*)
-            PROFILE="${1#*=}"
-            shift
-            ;;
-        --profile)
-            PROFILE="${2:-default}"
-            shift 2
-            ;;
-        -h|--help)
-            echo "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]"
-            exit 0
-            ;;
-        *)
-            # Back-compat: first non-flag argument is the profile name.
-            PROFILE="$1"
-            shift
-            ;;
-    esac
-done
+dotfiles.setup_styles
+dotfiles.parse_profile_args "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]" 1 "$@" || exit 1
 
 function install_shell_profile {
     local profile="$1"    
@@ -96,27 +57,12 @@ function install_shell_profile {
 
 function install_profiles {
     local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
-    local profiles=()
     local status=0
     local profile_dir
 
-    if [ "$PROFILE" = "all" ] || [ -z "$PROFILE" ]; then
-        shopt -s nullglob
-        for profile_dir in "$profiles_dir"/*; do
-            [ -d "$profile_dir" ] || continue
-            profiles+=("$(basename "$profile_dir")")
-        done
-        shopt -u nullglob
-    else
-        profiles=("$PROFILE")
-    fi
+    dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
 
-    [ "${#profiles[@]}" -gt 0 ] || {
-        echo "Error: no profiles found in $profiles_dir" >&2
-        return 1
-    }
-
-    for profile_dir in "${profiles[@]}"; do
+    for profile_dir in "${DOTFILES_PROFILES[@]}"; do
         install_shell_profile "$profile_dir" || status=1
     done
 

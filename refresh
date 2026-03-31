@@ -3,34 +3,9 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
-DRY_RUN=0
-PROFILE="default"
+source "$SCRIPT_DIR/src/bash/script-common.sh"
 
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --dry-run)
-            DRY_RUN=1
-            shift
-            ;;
-        --profile=*)
-            PROFILE="${1#*=}"
-            shift
-            ;;
-        --profile)
-            PROFILE="${2:-default}"
-            shift 2
-            ;;
-        -h|--help)
-            echo "Usage: $0 [--dry-run] [--profile <name|all>]"
-            exit 0
-            ;;
-        *)
-            # Back-compat: first non-flag arg is the profile name.
-            PROFILE="$1"
-            shift
-            ;;
-    esac
-done
+dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@" || exit 1
 
 function sort_vscode_settings {
     if [ "$DRY_RUN" -eq 0 ]; then
@@ -40,22 +15,18 @@ function sort_vscode_settings {
     local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
     [ -d "$profiles_dir" ] || return 0
 
-    local profile_dirs=()
-    if [ "$PROFILE" = "all" ] || [ -z "$PROFILE" ]; then
-        profile_dirs=("$profiles_dir"/*)
-    else
-        profile_dirs=("$profiles_dir/$PROFILE")
-    fi
+    dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
 
     local profile_dir
-    for profile_dir in "${profile_dirs[@]}"; do
-        [ -d "$profile_dir" ] || continue
+    for profile_dir in "${DOTFILES_PROFILES[@]}"; do
+        local profile_path="$profiles_dir/$profile_dir"
+        [ -d "$profile_path" ] || continue
 
         # Escape the space in "Application Support" so pathname expansion works.
         # Enable nullglob so an empty glob doesn't become a literal "*".
         shopt -s nullglob
         local settings_path
-        for settings_path in "$profile_dir"/Library/Application\ Support/Code/*/settings.json; do
+        for settings_path in "$profile_path"/Library/Application\ Support/Code/*/settings.json; do
             if [ "$DRY_RUN" -eq 1 ]; then
                 echo "DRY RUN: sort VSCode settings: $settings_path"
             else
