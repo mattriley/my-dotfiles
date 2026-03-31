@@ -273,11 +273,11 @@ if command -v zsh >/dev/null 2>&1; then
   cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
   out="$(
-    HOME="$tmp_home" zsh -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?' 2>&1
+    HOME="$tmp_home" zsh -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?' 2>&1
   )"
   rm -rf "$tmp_home"
-  if [[ "$out" != *"gs:0"* ]] || [[ "$out" != *"gr:0"* ]]; then
-    echo "FAIL: .zshrc should load shared git aliases: $out" >&2
+  if [[ "$out" != *"gs:0"* ]] || [[ "$out" != *"gr:0"* ]] || [[ "$out" != *"prompt_dev:0"* ]] || [[ "$out" != *"git_parse:0"* ]]; then
+    echo "FAIL: .zshrc should load shared shell modules: $out" >&2
     failures=$((failures+1))
   fi
 else

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export DOTFILES_DIR="/Users/mattriley/Home/Code/my-dotfiles"
+export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
 
 path_append_once() {
     local entry="$1"

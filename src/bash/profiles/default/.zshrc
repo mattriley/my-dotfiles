@@ -13,14 +13,18 @@ esac
 
 [ "$is_interactive" -eq 1 ] && echo "Shell: zsh"
 
-# Load shared git aliases when the repo path is configured.
-if [ -n "${DOTFILES_DIR:-}" ] && [ -f "$DOTFILES_DIR/src/bash/modules/git/aliases.sh" ]; then
-    source "$DOTFILES_DIR/src/bash/modules/git/aliases.sh"
+# Load shared shell modules when the repo path is configured.
+if [ -d "${BASH_MODULES:-}" ]; then
+    setopt local_options null_glob
+    for script_path in "$BASH_MODULES"/*/*.sh; do
+        source "$script_path"
+    done
 fi
 
-# Initialize nvm (if installed) so `node`/`npm` match your desired version in zsh.
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+if whence node.nvm.setup >/dev/null 2>&1; then
+    node.nvm.setup
+fi
 
-# Initialize nodenv (if installed) so `node`/`npm` match your desired version in zsh.
-command -v nodenv >/dev/null 2>&1 && eval "$(nodenv init -)"
+if whence node.nodenv.setup >/dev/null 2>&1; then
+    node.nodenv.setup
+fi
