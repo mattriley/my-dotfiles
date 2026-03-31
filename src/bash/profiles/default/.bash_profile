@@ -35,6 +35,11 @@ if [ -z "${DOTFILES_DIR:-}" ]; then
         echo "Error: DOTFILES_DIR is not set" >&2
     fi
     export BASH_MODULES="${BASH_MODULES:-}"
+elif [ ! -d "$DOTFILES_DIR" ]; then
+    if [ "$is_interactive" -eq 1 ]; then
+        echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
+    fi
+    export BASH_MODULES="${BASH_MODULES:-}"
 else
     export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
 fi

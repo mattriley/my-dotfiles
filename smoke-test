@@ -250,6 +250,22 @@ if [[ "$out" == *"DOTFILES_DIR is not set"* ]]; then
   failures=$((failures+1))
 fi
 
+echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+export DOTFILES_DIR="/no/such/dotfiles"
+EOF
+out="$(
+  HOME="$tmp_home" bash --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
+)"
+rm -rf "$tmp_home"
+if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
+  echo "FAIL: interactive .bash_profile should warn on invalid DOTFILES_DIR: $out" >&2
+  failures=$((failures+1))
+fi
+
 echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
 if command -v zsh >/dev/null 2>&1; then
   tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
