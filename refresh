@@ -5,6 +5,8 @@ cd "$SCRIPT_DIR" || exit 1
 
 source "$SCRIPT_DIR/src/bash/script-common.sh"
 # shellcheck disable=SC1091
+source "$SCRIPT_DIR/src/bash/modules/git/set-author.sh"
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/modules/macos/set-screencapture-location.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/modules/vscode/sort-settings.sh"
@@ -13,17 +15,6 @@ dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@
 parse_status=$?
 [ "$parse_status" -eq 2 ] && exit 0
 [ "$parse_status" -eq 0 ] || exit 1
-
-function set_git_author {
-    [ "$DRY_RUN" -eq 1 ] && return 0
-    command -v git >/dev/null 2>&1 || return 0
-
-    [ -n "$MY_AUTHOR_NAME" ] || return 0
-    [ -n "$MY_AUTHOR_EMAIL" ] || return 0
-
-    git config --global user.name "$MY_AUTHOR_NAME" || return 1
-    git config --global user.email "$MY_AUTHOR_EMAIL" || return 1
-}
 
 overall_status=0
 if [ "$DRY_RUN" -eq 1 ]; then
@@ -39,7 +30,7 @@ fi
 if [ "$DRY_RUN" -eq 0 ]; then
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
 fi
-set_git_author || overall_status=1
+[ "$DRY_RUN" -eq 1 ] || git.set_author || overall_status=1
 [ "$DRY_RUN" -eq 1 ] || macos.set_screencapture_location || overall_status=1
 
 if [ "$overall_status" -ne 0 ]; then
