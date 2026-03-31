@@ -46,6 +46,8 @@ require_func "node.list_dep_mismatch"
 require_func "flib.photos"
 require_func "gcu"
 require_func "git.push"
+require_func "vscode.install-extensions"
+require_func "vscode.setup-shell-command"
 
 echo "OK: util.trim output"
 if [ "$(util.trim "  hi  ")" != "hi" ]; then
@@ -63,6 +65,23 @@ else
     echo "FAIL: prompt.git_branch output format unexpected: $out" >&2
     failures=$((failures+1))
   fi
+fi
+
+echo "OK: git.parse_git_branch returns the current branch in a repo"
+tmp_git_dir="$(mktemp -d /tmp/my-dotfiles-git.XXXXXX)"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    cd "$2" || exit 1
+    git init -q
+    git checkout -q -b smoke-test-branch
+    git.parse_git_branch
+  ' _ "$MODULES_DIR/git/parse-git-branch.sh" "$tmp_git_dir" 2>/dev/null
+)"
+rm -rf "$tmp_git_dir"
+if [ "$out" != "(smoke-test-branch)" ]; then
+  echo "FAIL: git.parse_git_branch returned unexpected output: $out" >&2
+  failures=$((failures+1))
 fi
 
 echo "OK: flib.photos returns failure without exiting caller"
@@ -128,6 +147,23 @@ out="$(
 )"
 if [[ "$out" != *'gcu "$@" && git push'* ]]; then
   echo "FAIL: git.push is not calling gcu: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: vscode.install-extensions no-ops when no extensions are configured"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    unset MY_VSCODE_EXTENSIONS
+    output="$(vscode.install-extensions 2>&1)"
+    if [ -n "$output" ]; then
+      printf "%s\n" "$output"
+    fi
+    printf "status:%s" "$?"
+  ' _ "$MODULES_DIR/vscode/install-extensions.sh"
+)"
+if [ "$out" != "status:0" ]; then
+  echo "FAIL: vscode.install-extensions should no-op cleanly: $out" >&2
   failures=$((failures+1))
 fi
 
