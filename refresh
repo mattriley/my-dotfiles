@@ -5,6 +5,8 @@ cd "$SCRIPT_DIR" || exit 1
 
 source "$SCRIPT_DIR/src/bash/script-common.sh"
 # shellcheck disable=SC1091
+source "$SCRIPT_DIR/src/bash/modules/macos/set-screencapture-location.sh"
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/modules/vscode/sort-settings.sh"
 
 dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@"
@@ -21,25 +23,6 @@ function set_git_author {
 
     git config --global user.name "$MY_AUTHOR_NAME" || return 1
     git config --global user.email "$MY_AUTHOR_EMAIL" || return 1
-}
-
-function set_screencapture_location {
-    [ "$DRY_RUN" -eq 1 ] && return 0
-    command -v defaults >/dev/null 2>&1 || return 0
-    command -v killall >/dev/null 2>&1 || return 0
-
-    if [ -n "$SCREENCAPTURE_DIR" ] && [ -d "$SCREENCAPTURE_DIR" ]; then
-        if defaults write com.apple.screencapture location "$SCREENCAPTURE_DIR"; then
-            killall SystemUIServer 2>/dev/null || true
-            echo "Screenshot location set to $SCREENCAPTURE_DIR"
-        else
-            echo "Error: failed to set screenshot location via defaults" >&2
-            return 1
-        fi
-    else
-        echo "Error: Directory $SCREENCAPTURE_DIR does not exist"
-        return 1
-    fi
 }
 
 overall_status=0
@@ -59,7 +42,7 @@ if [ "$DRY_RUN" -eq 0 ]; then
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
 fi
 set_git_author || overall_status=1
-set_screencapture_location || overall_status=1
+[ "$DRY_RUN" -eq 1 ] || macos.set_screencapture_location || overall_status=1
 
 if [ "$overall_status" -ne 0 ]; then
     echo "refresh: finished with errors (profile=$PROFILE, dry-run=$DRY_RUN)." >&2
