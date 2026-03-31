@@ -1,8 +1,7 @@
 #!/bin/bash
 
 function gcm {
-    git diff --staged --quiet
-    if [ $? -eq 0 ]; then
+    if git diff --staged --quiet; then
         echo 'No staged changes.'
         return 1
     fi
