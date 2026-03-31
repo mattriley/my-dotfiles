@@ -286,6 +286,7 @@ require_func "flib.group"
 require_func "gcu"
 require_func "git.push"
 require_func "vscode.install-extensions"
+require_func "vscode.sort_settings"
 require_func "vscode.setup-shell-command"
 
 echo "OK: util.trim output"

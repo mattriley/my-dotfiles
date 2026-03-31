@@ -4,41 +4,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
 source "$SCRIPT_DIR/src/bash/script-common.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/src/bash/modules/vscode/sort-settings.sh"
 
 dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@"
 parse_status=$?
 [ "$parse_status" -eq 2 ] && exit 0
 [ "$parse_status" -eq 0 ] || exit 1
-
-function sort_vscode_settings {
-    if [ "$DRY_RUN" -eq 0 ]; then
-        command -v node >/dev/null 2>&1 || return 0
-    fi
-
-    local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
-    [ -d "$profiles_dir" ] || return 0
-
-    dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
-
-    local profile_dir
-    for profile_dir in "${DOTFILES_PROFILES[@]}"; do
-        local profile_path="$profiles_dir/$profile_dir"
-        [ -d "$profile_path" ] || continue
-
-        # Escape the space in "Application Support" so pathname expansion works.
-        # Enable nullglob so an empty glob doesn't become a literal "*".
-        shopt -s nullglob
-        local settings_path
-        for settings_path in "$profile_path"/Library/Application\ Support/Code/*/settings.json; do
-            if [ "$DRY_RUN" -eq 1 ]; then
-                echo "DRY RUN: sort VSCode settings: $settings_path"
-            else
-                node "$SCRIPT_DIR/src/node/sort-vscode-settings.js" "$settings_path"
-            fi
-        done
-        shopt -u nullglob
-    done
-}
 
 function set_git_author {
     [ "$DRY_RUN" -eq 1 ] && return 0
@@ -83,7 +55,9 @@ fi
 : "${MY_AUTHOR_NAME:=Matt Riley}"
 : "${MY_AUTHOR_EMAIL:=m@ttriley.dev}"
 
-sort_vscode_settings || overall_status=1
+if [ "$DRY_RUN" -eq 0 ]; then
+    vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
+fi
 set_git_author || overall_status=1
 set_screencapture_location || overall_status=1
 
