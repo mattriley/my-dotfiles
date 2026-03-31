@@ -215,6 +215,19 @@ if [[ "$out" == *"command not found"* ]]; then
   failures=$((failures+1))
 fi
 
+echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+out="$(
+  HOME="$tmp_home" zsh -f -c 'source "$HOME/.zshrc"' 2>&1
+)"
+rm -rf "$tmp_home"
+if [[ "$out" == *"command not found"* ]]; then
+  echo "FAIL: .zshrc should not require missing helper functions: $out" >&2
+  failures=$((failures+1))
+fi
+
 if [ "$failures" -gt 0 ]; then
   echo "Smoke test finished with $failures failure(s)." >&2
   exit 1
