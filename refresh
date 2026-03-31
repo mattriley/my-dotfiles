@@ -5,19 +5,40 @@ cd "$SCRIPT_DIR"
 
 function sort_vscode_settings {
     command -v node >/dev/null 2>&1 || return 0
-    find "src/bash/profiles/"*"/Library/Application Support/Code/"*"/settings.json" -type f -print0 | 
-        while IFS= read -r -d '' path; do 
-            node "$SCRIPT_DIR/src/node/sort-vscode-settings.js" "$path";
+
+    local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
+    [ -d "$profiles_dir" ] || return 0
+
+    local profile_dir
+    for profile_dir in "$profiles_dir"/*; do
+        [ -d "$profile_dir" ] || continue
+
+        # Escape the space in "Application Support" so pathname expansion works.
+        # Enable nullglob so an empty glob doesn't become a literal "*".
+        shopt -s nullglob
+        local settings_path
+        for settings_path in "$profile_dir"/Library/Application\ Support/Code/*/settings.json; do
+            node "$SCRIPT_DIR/src/node/sort-vscode-settings.js" "$settings_path"
         done
+        shopt -u nullglob
+    done
 }
 
 function set_git_author {
+    command -v git >/dev/null 2>&1 || return 0
+
+    [ -n "$MY_AUTHOR_NAME" ] || return 0
+    [ -n "$MY_AUTHOR_EMAIL" ] || return 0
+
     git config --global user.name "$MY_AUTHOR_NAME"
     git config --global user.email "$MY_AUTHOR_EMAIL"
 }
 
 function set_screencapture_location {
-    if [ -d "$SCREENCAPTURE_DIR" ]; then
+    command -v defaults >/dev/null 2>&1 || return 0
+    command -v killall >/dev/null 2>&1 || return 0
+
+    if [ -n "$SCREENCAPTURE_DIR" ] && [ -d "$SCREENCAPTURE_DIR" ]; then
         defaults write com.apple.screencapture location "$SCREENCAPTURE_DIR"
         killall SystemUIServer
         echo "Screenshot location set to $SCREENCAPTURE_DIR"
@@ -27,6 +48,13 @@ function set_screencapture_location {
 }
 
 "$SCRIPT_DIR/install-shell-profile"
+
+# Provide sane defaults when `refresh` is run outside a shell startup.
+: "${HOME_DIR:=$HOME/Home}"
+: "${SCREENCAPTURE_DIR:=$HOME_DIR/Screenshots}"
+: "${MY_AUTHOR_NAME:=Matt Riley}"
+: "${MY_AUTHOR_EMAIL:=m@ttriley.dev}"
+
 sort_vscode_settings
 set_git_author
 set_screencapture_location
