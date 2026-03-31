@@ -43,7 +43,10 @@ require_func "node.extract_node_modules"
 require_func "node.restore_node_modules"
 require_func "node.list_node_modules"
 require_func "node.list_dep_mismatch"
+require_func "node.nodenv.install"
+require_func "node.nvm.install"
 require_func "flib.photos"
+require_func "flib.group"
 require_func "gcu"
 require_func "git.push"
 require_func "vscode.install-extensions"
@@ -97,6 +100,19 @@ out="$(
 )"
 if [ "$out" != $'status:1\nafter' ]; then
   echo "FAIL: flib.photos should return 1 without exiting caller: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: flib.group fails cleanly without a subject"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    flib.group "" >/dev/null 2>&1
+    printf "status:%s" "$?"
+  ' _ "$MODULES_DIR/flib/group.sh"
+)"
+if [ "$out" != "status:1" ]; then
+  echo "FAIL: flib.group should reject an empty subject: $out" >&2
   failures=$((failures+1))
 fi
 
