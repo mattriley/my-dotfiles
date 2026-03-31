@@ -5,7 +5,10 @@ cd "$SCRIPT_DIR" || exit 1
 
 source "$SCRIPT_DIR/src/bash/script-common.sh"
 
-dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@" || exit 1
+dotfiles.parse_profile_args "Usage: $0 [--dry-run] [--profile <name|all>]" 0 "$@"
+parse_status=$?
+[ "$parse_status" -eq 2 ] && exit 0
+[ "$parse_status" -eq 0 ] || exit 1
 
 function sort_vscode_settings {
     if [ "$DRY_RUN" -eq 0 ]; then

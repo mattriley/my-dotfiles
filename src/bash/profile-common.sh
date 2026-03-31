@@ -1,14 +1,14 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
-dotfiles.is_interactive() {
+function dotfiles.is_interactive {
     case $- in
         *i*) return 0 ;;
         *) return 1 ;;
     esac
 }
 
-dotfiles.path_append_once() {
+function dotfiles.path_append_once {
     local entry="$1"
     case ":$PATH:" in
         *":$entry:"*) ;;
@@ -16,7 +16,7 @@ dotfiles.path_append_once() {
     esac
 }
 
-dotfiles.has_function() {
+function dotfiles.has_function {
     local fn="$1"
 
     if [ -n "${ZSH_VERSION:-}" ]; then
@@ -26,7 +26,7 @@ dotfiles.has_function() {
     fi
 }
 
-dotfiles.validate_dotfiles_dir() {
+function dotfiles.validate_dotfiles_dir {
     local is_interactive="$1"
 
     if [ -z "${DOTFILES_DIR:-}" ]; then
@@ -45,7 +45,7 @@ dotfiles.validate_dotfiles_dir() {
     return 0
 }
 
-dotfiles.load_modules() {
+function dotfiles.load_modules {
     [ -d "${BASH_MODULES:-}" ] || return 0
 
     if [ -n "${ZSH_VERSION:-}" ]; then
@@ -70,24 +70,24 @@ dotfiles.load_modules() {
     shopt -u nullglob
 }
 
-dotfiles.setup_node() {
+function dotfiles.setup_node {
     dotfiles.has_function "node.nvm.setup" && node.nvm.setup
     dotfiles.has_function "node.nodenv.setup" && node.nodenv.setup
 }
 
-dotfiles.apply_prompt() {
+function dotfiles.apply_prompt {
     local is_interactive="$1"
     [ "$is_interactive" -eq 1 ] || return 0
     dotfiles.has_function "prompt.dev" && prompt.dev
 }
 
-dotfiles.print_shell_banner() {
+function dotfiles.print_shell_banner {
     local is_interactive="$1"
     local shell_name="$2"
     [ "$is_interactive" -eq 1 ] && echo "Shell: $shell_name"
 }
 
-dotfiles.export_profile_env() {
+function dotfiles.export_profile_env {
     export NODE_OPTIONS="--max_old_space_size=32768"
     export UV_THREADPOOL_SIZE=80
     export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -112,7 +112,7 @@ dotfiles.export_profile_env() {
     export SCREENCAPTURE_DIR="$HOME_DIR/Screenshots"
 }
 
-dotfiles.setup_colors() {
+function dotfiles.setup_colors {
     if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
         export NORM
         NORM=$(tput sgr0)
@@ -139,11 +139,11 @@ dotfiles.setup_colors() {
     fi
 }
 
-dotfiles.setup_bash_prompt_defaults() {
+function dotfiles.setup_bash_prompt_defaults {
     export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 }
 
-dotfiles.source_optional_file() {
+function dotfiles.source_optional_file {
     local path="$1"
     # shellcheck disable=SC1090
     [ -f "$path" ] && source "$path"

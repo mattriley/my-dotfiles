@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function net.kill_port { 
+function net.kill_port {
 
     local port="$1"
     local pids=()

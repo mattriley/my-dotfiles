@@ -4,9 +4,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/src/bash/script-common.sh"
 
 dotfiles.setup_styles
-dotfiles.parse_profile_args "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]" 1 "$@" || exit 1
+dotfiles.parse_profile_args "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]" 1 "$@"
+parse_status=$?
+[ "$parse_status" -eq 2 ] && exit 0
+[ "$parse_status" -eq 0 ] || exit 1
 
-install_profile_file() {
+function install_profile_file {
     local path="$1"
     local dest="$2"
     local base="$3"

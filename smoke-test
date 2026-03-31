@@ -13,34 +13,34 @@ fi
 
 failures=0
 
-fail() {
+function fail {
   local message="$1"
   echo "FAIL: $message" >&2
   failures=$((failures+1))
 }
 
-expect_eq() {
+function expect_eq {
   local actual="$1"
   local expected="$2"
   local message="$3"
   [ "$actual" = "$expected" ] || fail "$message: $actual"
 }
 
-expect_contains() {
+function expect_contains {
   local haystack="$1"
   local needle="$2"
   local message="$3"
   [[ "$haystack" == *"$needle"* ]] || fail "$message: $haystack"
 }
 
-expect_not_contains() {
+function expect_not_contains {
   local haystack="$1"
   local needle="$2"
   local message="$3"
   [[ "$haystack" != *"$needle"* ]] || fail "$message: $haystack"
 }
 
-expect_line_count() {
+function expect_line_count {
   local haystack="$1"
   local pattern="$2"
   local expected_count="$3"
@@ -50,11 +50,11 @@ expect_line_count() {
   [ "$actual_count" -eq "$expected_count" ] || fail "$message: $haystack"
 }
 
-make_temp_home() {
+function make_temp_home {
   mktemp -d /tmp/my-dotfiles-home.XXXXXX
 }
 
-setup_temp_profile_home() {
+function setup_temp_profile_home {
   local tmp_home="$1"
   local shell_name="$2"
 
@@ -66,19 +66,19 @@ setup_temp_profile_home() {
   fi
 }
 
-run_bash_profile() {
+function run_bash_profile {
   local tmp_home="$1"
   shift
   HOME="$tmp_home" bash "$@" 2>&1
 }
 
-run_zsh_profile() {
+function run_zsh_profile {
   local tmp_home="$1"
   shift
   HOME="$tmp_home" zsh "$@" 2>&1
 }
 
-assert_bash_profile_noninteractive_clean() {
+function assert_bash_profile_noninteractive_clean {
   local tmp_home
   local out
 
@@ -91,7 +91,7 @@ assert_bash_profile_noninteractive_clean() {
   expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
 }
 
-assert_bash_profile_loads_modules() {
+function assert_bash_profile_loads_modules {
   local tmp_home
   local out
 
@@ -105,7 +105,7 @@ assert_bash_profile_loads_modules() {
   expect_contains "$out" "nvm_loaded" "configured BASH_MODULES should load repo modules"
 }
 
-assert_bash_profile_unset_dotfiles_dir_quiet() {
+function assert_bash_profile_unset_dotfiles_dir_quiet {
   local tmp_home
   local out
 
@@ -121,7 +121,7 @@ EOF
   expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
 }
 
-assert_bash_profile_invalid_dotfiles_dir_warns() {
+function assert_bash_profile_invalid_dotfiles_dir_warns {
   local tmp_home
   local out
 
@@ -137,7 +137,7 @@ EOF
   expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .bash_profile should warn on invalid DOTFILES_DIR"
 }
 
-assert_bash_profile_idempotent() {
+function assert_bash_profile_idempotent {
   local tmp_home
   local out
 
@@ -151,7 +151,7 @@ assert_bash_profile_idempotent() {
   expect_contains "$out" "loaded:1" ".bash_profile should only initialize once"
 }
 
-assert_zsh_profile_noninteractive_clean() {
+function assert_zsh_profile_noninteractive_clean {
   local tmp_home
   local out
 
@@ -165,7 +165,7 @@ assert_zsh_profile_noninteractive_clean() {
   expect_not_contains "$out" "Shell: zsh" ".zshrc should stay quiet in non-interactive shells"
 }
 
-assert_zsh_profile_loads_modules() {
+function assert_zsh_profile_loads_modules {
   local tmp_home
   local out
 
@@ -181,7 +181,7 @@ assert_zsh_profile_loads_modules() {
   expect_contains "$out" "git_parse:0" ".zshrc should load shared shell modules"
 }
 
-assert_zsh_profile_applies_prompt() {
+function assert_zsh_profile_applies_prompt {
   local tmp_home
   local out
 
@@ -195,7 +195,7 @@ assert_zsh_profile_applies_prompt() {
   expect_contains "$out" '$(prompt.git_branch) $ ' "interactive .zshrc should apply prompt.dev"
 }
 
-assert_zsh_profile_invalid_dotfiles_dir_warns() {
+function assert_zsh_profile_invalid_dotfiles_dir_warns {
   local tmp_home
   local out
 
@@ -212,7 +212,7 @@ EOF
   expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .zshrc should warn on invalid DOTFILES_DIR"
 }
 
-assert_zsh_profile_idempotent() {
+function assert_zsh_profile_idempotent {
   local tmp_home
   local out
 
@@ -235,7 +235,7 @@ for module_path in "$MODULES_DIR/"*; do
 done
 shopt -u nullglob
 
-require_func() {
+function require_func {
   local fn="$1"
 if ! declare -f "$fn" >/dev/null 2>&1; then
     fail "missing function: $fn"

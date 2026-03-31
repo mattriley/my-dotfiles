@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
-dotfiles.setup_styles() {
+function dotfiles.setup_styles {
     if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
         NORM=$(tput sgr0)
         BOLD=$(tput bold)
@@ -11,7 +11,7 @@ dotfiles.setup_styles() {
     fi
 }
 
-dotfiles.parse_profile_args() {
+function dotfiles.parse_profile_args {
     local usage="$1"
     local supports_list="$2"
     shift 2
@@ -47,7 +47,7 @@ dotfiles.parse_profile_args() {
                 ;;
             -h|--help)
                 echo "$usage"
-                exit 0
+                return 2
                 ;;
             *)
                 PROFILE="$1"
@@ -57,7 +57,7 @@ dotfiles.parse_profile_args() {
     done
 }
 
-dotfiles.collect_profiles() {
+function dotfiles.collect_profiles {
     local profiles_dir="$1"
     local profile="${2:-default}"
     local profile_dir
@@ -81,7 +81,7 @@ dotfiles.collect_profiles() {
     }
 }
 
-dotfiles.sync_profile_files() {
+function dotfiles.sync_profile_files {
     local script_dir="$1"
     local profile="$2"
     local action_label="$3"
