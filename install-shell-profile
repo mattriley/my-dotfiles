@@ -5,6 +5,35 @@ BOLD=$(tput bold)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+DRY_RUN=0
+PROFILE="default"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        --profile=*)
+            PROFILE="${1#*=}"
+            shift
+            ;;
+        --profile)
+            PROFILE="${2:-default}"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: $0 [--dry-run] [--profile <name>]"
+            exit 0
+            ;;
+        *)
+            # Back-compat: first non-flag argument is the profile name.
+            PROFILE="$1"
+            shift
+            ;;
+    esac
+done
+
 function install_shell_profile {
     local profile="$1"    
     local target="$SCRIPT_DIR/src/bash/profiles/$profile"
@@ -17,19 +46,30 @@ function install_shell_profile {
     echo "Installing $BOLD$profile$NORM profile..."
     echo
 
+    local failures=0
     find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
             local dest="$HOME${path#"$target"}"
             local base; base="$(basename "$path")"
             # Skip editor/system cruft so it doesn't get installed into $HOME
             [ "$base" = ".DS_Store" ] && continue
-            mkdir -p "$(dirname "$dest")"
-            ln -sfv "$path" "$dest"
+
+            if [ "$DRY_RUN" -eq 1 ]; then
+                echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
+                continue
+            fi
+
+            mkdir -p "$(dirname "$dest")" || { failures=$((failures+1)); continue; }
+            ln -sfv "$path" "$dest" || failures=$((failures+1))
         done
+
+    if [ "$failures" -gt 0 ]; then
+        echo "Completed with $failures error(s)." >&2
+        return 1
+    fi
 
     echo
 }
 
 echo
-install_shell_profile "default"
-[ "$1" ] && install_shell_profile "$1" 
+install_shell_profile "$PROFILE"

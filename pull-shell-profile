@@ -5,6 +5,35 @@ BOLD=$(tput bold)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+DRY_RUN=0
+PROFILE="default"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        --profile=*)
+            PROFILE="${1#*=}"
+            shift
+            ;;
+        --profile)
+            PROFILE="${2:-default}"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: $0 [--dry-run] [--profile <name>]"
+            exit 0
+            ;;
+        *)
+            # Back-compat: first non-flag argument is the profile name.
+            PROFILE="$1"
+            shift
+            ;;
+    esac
+done
+
 function pull_shell_profile {
     local profile="$1"    
     local target="$SCRIPT_DIR/src/bash/profiles/$profile"
@@ -17,6 +46,7 @@ function pull_shell_profile {
     echo "Pulling $BOLD$profile$NORM profile..."
     echo
 
+    local failures=0
     find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
             local dest="$HOME${path#"$target"}"
@@ -26,12 +56,22 @@ function pull_shell_profile {
             # Only pull regular files (avoid overwriting repo-managed symlinks).
             [ ! -L "$dest" ] || continue
             [ -e "$dest" ] || continue
-            cp -f "$dest" "$path"
+
+            if [ "$DRY_RUN" -eq 1 ]; then
+                echo "DRY RUN: cp -f \"$dest\" \"$path\""
+                continue
+            fi
+
+            cp -f "$dest" "$path" || failures=$((failures+1))
         done
+
+    if [ "$failures" -gt 0 ]; then
+        echo "Completed with $failures error(s)." >&2
+        return 1
+    fi
 
     echo
 }
 
 echo
-pull_shell_profile "default"
-[ "$1" ] && pull_shell_profile "$1" 
+pull_shell_profile "$PROFILE"
