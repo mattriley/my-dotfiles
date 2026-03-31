@@ -201,6 +201,20 @@ if [[ "$out" == *"Error: profile directory not found"* ]]; then
   failures=$((failures+1))
 fi
 
+echo "OK: .bash_profile degrades cleanly when modules are unavailable"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+out="$(
+  TERM='' HOME="$tmp_home" \
+    bash --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
+)"
+rm -rf "$tmp_home"
+if [[ "$out" == *"command not found"* ]]; then
+  echo "FAIL: .bash_profile should not call missing helper functions: $out" >&2
+  failures=$((failures+1))
+fi
+
 if [ "$failures" -gt 0 ]; then
   echo "Smoke test finished with $failures failure(s)." >&2
   exit 1
