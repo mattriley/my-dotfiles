@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 
 dotfiles.is_interactive() {
     case $- in
@@ -57,4 +58,66 @@ dotfiles.print_shell_banner() {
     local is_interactive="$1"
     local shell_name="$2"
     [ "$is_interactive" -eq 1 ] && echo "Shell: $shell_name"
+}
+
+dotfiles.export_profile_env() {
+    export NODE_OPTIONS="--max_old_space_size=32768"
+    export UV_THREADPOOL_SIZE=80
+    export BASH_SILENCE_DEPRECATION_WARNING=1
+
+    export HOME_DIR="$HOME/Home"
+    export TEMP_DIR="$HOME_DIR/.temp"
+    export CODE_DIR="${CODE_DIR:-$HOME/Home/Code}"
+
+    export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
+    export ITERMOCIL_LAYOUT_HIGHRES="even-vertical"
+    export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_DEFAULT"
+
+    # WARNING: Naming this VSCODE_EXTENSIONS will conflict and cause side effects with VSCode.
+    export MY_VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
+
+    export MY_AUTHOR_NAME="Matt Riley"
+    export MY_AUTHOR_EMAIL="m@ttriley.dev"
+    export MY_AUTHOR_URL="https://github.com/mattriley"
+    export MY_PHOTOS="$HOME_DIR/Photos › Matt"
+    export PHOTOS_PARTIAL_PATH="$HOME_DIR/Photos › "
+    export PHOTOS_DEFAULT_PROFILE="Matt"
+    export SCREENCAPTURE_DIR="$HOME_DIR/Screenshots"
+}
+
+dotfiles.setup_colors() {
+    if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
+        export NORM
+        NORM=$(tput sgr0)
+        export BOLD
+        BOLD=$(tput bold)
+        export RED
+        RED=$(tput setaf 1)
+        export GREEN
+        GREEN=$(tput setaf 2)
+        export YELLOW
+        YELLOW=$(tput setaf 3)
+        export BLUE
+        BLUE=$(tput setaf 4)
+        export MAGENTA
+        MAGENTA=$(tput setaf 5)
+    else
+        export NORM=""
+        export BOLD=""
+        export RED=""
+        export GREEN=""
+        export YELLOW=""
+        export BLUE=""
+        export MAGENTA=""
+    fi
+}
+
+dotfiles.setup_bash_prompt_defaults() {
+    export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
+}
+
+dotfiles.source_optional_file() {
+    local path="$1"
+    # shellcheck disable=SC1090
+    [ -f "$path" ] && source "$path"
 }
