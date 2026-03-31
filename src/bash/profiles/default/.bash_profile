@@ -78,7 +78,19 @@ if [ -d "$BASH_MODULES" ]; then
 fi
 
 function t { npx -p "task-library" task "$@"; }
-display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
-prompt.dev
-node.nvm.setup
-node.nodenv.setup
+
+if declare -f display.is-highres >/dev/null 2>&1; then
+    display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
+fi
+
+if declare -f prompt.dev >/dev/null 2>&1; then
+    prompt.dev
+fi
+
+if declare -f node.nvm.setup >/dev/null 2>&1; then
+    node.nvm.setup
+fi
+
+if declare -f node.nodenv.setup >/dev/null 2>&1; then
+    node.nodenv.setup
+fi
