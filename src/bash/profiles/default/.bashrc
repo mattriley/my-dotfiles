@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DOTFILES_DIR="${DOTFILES_DIR:-/Users/mattriley/Home/Code/my-dotfiles}"
+export DOTFILES_DIR="/Users/mattriley/Home/Code/my-dotfiles"
 
 path_append_once() {
     local entry="$1"

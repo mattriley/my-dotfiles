@@ -233,6 +233,23 @@ if [[ "$out" != *"prompt_loaded"* ]] || [[ "$out" != *"nvm_loaded"* ]]; then
   failures=$((failures+1))
 fi
 
+echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+unset DOTFILES_DIR
+EOF
+out="$(
+  TERM='' HOME="$tmp_home" \
+    bash --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
+)"
+rm -rf "$tmp_home"
+if [[ "$out" == *"DOTFILES_DIR is not set"* ]]; then
+  echo "FAIL: .bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset: $out" >&2
+  failures=$((failures+1))
+fi
+
 echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
 if command -v zsh >/dev/null 2>&1; then
   tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
