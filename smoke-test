@@ -19,6 +19,37 @@ fail() {
   failures=$((failures+1))
 }
 
+expect_eq() {
+  local actual="$1"
+  local expected="$2"
+  local message="$3"
+  [ "$actual" = "$expected" ] || fail "$message: $actual"
+}
+
+expect_contains() {
+  local haystack="$1"
+  local needle="$2"
+  local message="$3"
+  [[ "$haystack" == *"$needle"* ]] || fail "$message: $haystack"
+}
+
+expect_not_contains() {
+  local haystack="$1"
+  local needle="$2"
+  local message="$3"
+  [[ "$haystack" != *"$needle"* ]] || fail "$message: $haystack"
+}
+
+expect_line_count() {
+  local haystack="$1"
+  local pattern="$2"
+  local expected_count="$3"
+  local message="$4"
+  local actual_count
+  actual_count="$(printf '%s\n' "$haystack" | grep -c "$pattern")"
+  [ "$actual_count" -eq "$expected_count" ] || fail "$message: $haystack"
+}
+
 make_temp_home() {
   mktemp -d /tmp/my-dotfiles-home.XXXXXX
 }
@@ -86,9 +117,7 @@ require_func "vscode.install-extensions"
 require_func "vscode.setup-shell-command"
 
 echo "OK: util.trim output"
-if [ "$(util.trim "  hi  ")" != "hi" ]; then
-  fail "util.trim produced unexpected output"
-fi
+expect_eq "$(util.trim "  hi  ")" "hi" "util.trim produced unexpected output"
 
 echo "OK: prompt.git_branch can run"
 if ! out="$(prompt.git_branch 2>/dev/null)"; then
@@ -112,9 +141,7 @@ out="$(
   ' _ "$MODULES_DIR/git/parse-git-branch.sh" "$tmp_git_dir" 2>/dev/null
 )"
 rm -rf "$tmp_git_dir"
-if [ "$out" != "(smoke-test-branch)" ]; then
-  fail "git.parse_git_branch returned unexpected output: $out"
-fi
+expect_eq "$out" "(smoke-test-branch)" "git.parse_git_branch returned unexpected output"
 
 echo "OK: flib.photos returns failure without exiting caller"
 out="$(
@@ -127,9 +154,7 @@ out="$(
     echo after
   ' _ "$MODULES_DIR/flib/photos.sh" "$SCRIPT_DIR" 2>/dev/null
 )"
-if [ "$out" != $'status:1\nafter' ]; then
-  fail "flib.photos should return 1 without exiting caller: $out"
-fi
+expect_eq "$out" $'status:1\nafter' "flib.photos should return 1 without exiting caller"
 
 echo "OK: flib.group fails cleanly without a subject"
 out="$(
@@ -139,9 +164,7 @@ out="$(
     printf "status:%s" "$?"
   ' _ "$MODULES_DIR/flib/group.sh"
 )"
-if [ "$out" != "status:1" ]; then
-  fail "flib.group should reject an empty subject: $out"
-fi
+expect_eq "$out" "status:1" "flib.group should reject an empty subject"
 
 echo "OK: node.extract_node_modules is quiet when there is nothing to move"
 empty_code_dir="$(mktemp -d /tmp/my-dotfiles-smoke-code.XXXXXX)"
@@ -157,9 +180,7 @@ out="$(
   ' _ "$MODULES_DIR/node/extract-node-modules.sh" "$empty_code_dir" "$empty_temp_dir"
 )"
 rm -rf "$empty_code_dir" "$empty_temp_dir"
-if [ "$out" != "status:0" ]; then
-  fail "node.extract_node_modules should no-op cleanly: $out"
-fi
+expect_eq "$out" "status:0" "node.extract_node_modules should no-op cleanly"
 
 echo "OK: node.list_node_modules is quiet when there is nothing to list"
 empty_code_dir="$(mktemp -d /tmp/my-dotfiles-smoke-code.XXXXXX)"
@@ -174,9 +195,7 @@ out="$(
   ' _ "$MODULES_DIR/node/list-node-modules.sh" "$empty_code_dir"
 )"
 rm -rf "$empty_code_dir"
-if [ "$out" != "status:0" ]; then
-  fail "node.list_node_modules should no-op cleanly: $out"
-fi
+expect_eq "$out" "status:0" "node.list_node_modules should no-op cleanly"
 
 echo "OK: git.push is wired through gcu"
 out="$(
@@ -186,9 +205,7 @@ out="$(
     declare -f git.push
   ' _ "$MODULES_DIR/git/gcu.sh" "$MODULES_DIR/git/push.sh"
 )"
-if [[ "$out" != *'gcu "$@" && git push'* ]]; then
-  fail "git.push is not calling gcu: $out"
-fi
+expect_contains "$out" 'gcu "$@" && git push' "git.push is not calling gcu"
 
 echo "OK: vscode.install-extensions no-ops when no extensions are configured"
 out="$(
@@ -202,37 +219,27 @@ out="$(
     printf "status:%s" "$?"
   ' _ "$MODULES_DIR/vscode/install-extensions.sh"
 )"
-if [ "$out" != "status:0" ]; then
-  fail "vscode.install-extensions should no-op cleanly: $out"
-fi
+expect_eq "$out" "status:0" "vscode.install-extensions should no-op cleanly"
 
 echo "OK: install-shell-profile supports --profile all in plan mode"
 out="$(
   bash --noprofile --norc "$SCRIPT_DIR/install-shell-profile" --list --profile all 2>&1
 )"
-if [[ "$out" == *"Error: profile directory not found"* ]]; then
-  fail "install-shell-profile should expand --profile all: $out"
-fi
+expect_not_contains "$out" "Error: profile directory not found" "install-shell-profile should expand --profile all"
 
 echo "OK: pull-shell-profile supports --profile all in plan mode"
 out="$(
   bash --noprofile --norc "$SCRIPT_DIR/pull-shell-profile" --list --profile all 2>&1
 )"
-if [[ "$out" == *"Error: profile directory not found"* ]]; then
-  fail "pull-shell-profile should expand --profile all: $out"
-fi
+expect_not_contains "$out" "Error: profile directory not found" "pull-shell-profile should expand --profile all"
 
 echo "OK: .bash_profile degrades cleanly when modules are unavailable"
 tmp_home="$(make_temp_home)"
 setup_temp_profile_home "$tmp_home" "bash"
 out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
-if [[ "$out" == *"command not found"* ]]; then
-  fail ".bash_profile should not call missing helper functions: $out"
-fi
-if [[ "$out" == *"Shell: bash"* ]]; then
-  fail ".bash_profile should stay quiet in non-interactive shells: $out"
-fi
+expect_not_contains "$out" "command not found" ".bash_profile should not call missing helper functions"
+expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
 
 echo "OK: configured BASH_MODULES loads repo modules"
 tmp_home="$(make_temp_home)"
@@ -240,9 +247,8 @@ ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_pro
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
 out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit')"
 rm -rf "$tmp_home"
-if [[ "$out" != *"prompt_loaded"* ]] || [[ "$out" != *"nvm_loaded"* ]]; then
-  fail "configured BASH_MODULES should load repo modules: $out"
-fi
+expect_contains "$out" "prompt_loaded" "configured BASH_MODULES should load repo modules"
+expect_contains "$out" "nvm_loaded" "configured BASH_MODULES should load repo modules"
 
 echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
 tmp_home="$(make_temp_home)"
@@ -253,9 +259,7 @@ unset DOTFILES_DIR
 EOF
 out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
-if [[ "$out" == *"DOTFILES_DIR is not set"* ]]; then
-  fail ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset: $out"
-fi
+expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
 
 echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
 tmp_home="$(make_temp_home)"
@@ -266,9 +270,7 @@ export DOTFILES_DIR="/no/such/dotfiles"
 EOF
 out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
-if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
-  fail "interactive .bash_profile should warn on invalid DOTFILES_DIR: $out"
-fi
+expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .bash_profile should warn on invalid DOTFILES_DIR"
 
 echo "OK: .bash_profile is idempotent when sourced twice"
 tmp_home="$(make_temp_home)"
@@ -276,9 +278,8 @@ setup_temp_profile_home "$tmp_home" "bash"
 # shellcheck disable=SC2016
 out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit')"
 rm -rf "$tmp_home"
-if [ "$(printf '%s\n' "$out" | grep -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
-  fail ".bash_profile should only initialize once: $out"
-fi
+expect_line_count "$out" '^Shell: bash$' 1 ".bash_profile should only initialize once"
+expect_contains "$out" "loaded:1" ".bash_profile should only initialize once"
 
   echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
   if command -v zsh >/dev/null 2>&1; then
@@ -287,12 +288,8 @@ fi
   # shellcheck disable=SC2016
   out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"')"
   rm -rf "$tmp_home"
-  if [[ "$out" == *"command not found"* ]]; then
-    fail ".zshrc should not require missing helper functions: $out"
-  fi
-  if [[ "$out" == *"Shell: zsh"* ]]; then
-    fail ".zshrc should stay quiet in non-interactive shells: $out"
-  fi
+  expect_not_contains "$out" "command not found" ".zshrc should not require missing helper functions"
+  expect_not_contains "$out" "Shell: zsh" ".zshrc should stay quiet in non-interactive shells"
 
   echo "OK: .zshrc loads shared shell modules"
   tmp_home="$(make_temp_home)"
@@ -300,9 +297,10 @@ fi
   # shellcheck disable=SC2016
   out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?')"
   rm -rf "$tmp_home"
-  if [[ "$out" != *"gs:0"* ]] || [[ "$out" != *"gr:0"* ]] || [[ "$out" != *"prompt_dev:0"* ]] || [[ "$out" != *"git_parse:0"* ]]; then
-    fail ".zshrc should load shared shell modules: $out"
-  fi
+  expect_contains "$out" "gs:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "gr:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "prompt_dev:0" ".zshrc should load shared shell modules"
+  expect_contains "$out" "git_parse:0" ".zshrc should load shared shell modules"
 
   echo "OK: interactive .zshrc applies prompt.dev"
   tmp_home="$(make_temp_home)"
@@ -311,9 +309,7 @@ fi
   out="$(run_zsh_profile "$tmp_home" -i -c 'print -r -- "$PS1"')"
   rm -rf "$tmp_home"
   # shellcheck disable=SC2016
-  if [[ "$out" != *'$(prompt.git_branch) $ '* ]]; then
-    fail "interactive .zshrc should apply prompt.dev: $out"
-  fi
+  expect_contains "$out" '$(prompt.git_branch) $ ' "interactive .zshrc should apply prompt.dev"
 
   echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
   tmp_home="$(make_temp_home)"
@@ -325,9 +321,7 @@ export BASH_MODULES="$DOTFILES_DIR/src/bash/modules"
 EOF
   out="$(run_zsh_profile "$tmp_home" -i -c exit)"
   rm -rf "$tmp_home"
-  if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
-    fail "interactive .zshrc should warn on invalid DOTFILES_DIR: $out"
-  fi
+  expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .zshrc should warn on invalid DOTFILES_DIR"
 
   echo "OK: .zshrc is idempotent when sourced twice"
   tmp_home="$(make_temp_home)"
@@ -335,9 +329,8 @@ EOF
   # shellcheck disable=SC2016
   out="$(run_zsh_profile "$tmp_home" -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"')"
   rm -rf "$tmp_home"
-  if [ "$(printf '%s\n' "$out" | grep -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
-    fail ".zshrc should only initialize once: $out"
-  fi
+  expect_line_count "$out" '^Shell: zsh$' 1 ".zshrc should only initialize once"
+  expect_contains "$out" "loaded:1" ".zshrc should only initialize once"
 else
   echo "SKIP: zsh is not installed"
 fi
