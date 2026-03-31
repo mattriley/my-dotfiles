@@ -14,6 +14,9 @@ To switch iTerm back to bash:
 - Profiles > Command > Custom Shell: `/bin/bash`
 
 ## Usage
+### Dependency bootstrap
+Run `./install-dependencies` to install the small set of external tools this repo expects for validation and maintenance. The script is rerunnable and skips packages that are already installed.
+
 ### Validation
 Run `./smoke-test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
 

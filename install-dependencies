@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -u
+
+function has_command {
+    command -v "$1" >/dev/null 2>&1
+}
+
+function detect_package_manager {
+    if has_command brew; then
+        printf '%s\n' brew
+        return 0
+    fi
+
+    if has_command apt-get; then
+        printf '%s\n' apt
+        return 0
+    fi
+
+    return 1
+}
+
+function ensure_command {
+    local package_manager="$1"
+    local command_name="$2"
+    local package_name="$3"
+
+    if has_command "$command_name"; then
+        echo "OK: $command_name"
+        return 0
+    fi
+
+    if [ "$package_manager" = "brew" ]; then
+        echo "Installing with Homebrew: $package_name"
+        brew install "$package_name"
+        return $?
+    fi
+
+    echo "Installing with apt: $package_name"
+    sudo apt-get update
+    sudo apt-get install -y "$package_name"
+}
+
+package_manager="$(detect_package_manager)" || {
+    echo "Error: supported package manager not found (expected brew or apt-get)." >&2
+    exit 1
+}
+
+if [ "$package_manager" = "brew" ]; then
+    ensure_command "$package_manager" jq jq || exit 1
+    ensure_command "$package_manager" shellcheck shellcheck || exit 1
+elif [ "$package_manager" = "apt" ]; then
+    ensure_command "$package_manager" jq jq || exit 1
+    ensure_command "$package_manager" shellcheck shellcheck || exit 1
+    ensure_command "$package_manager" zsh zsh || exit 1
+fi
+
+echo "install-dependencies: OK"
