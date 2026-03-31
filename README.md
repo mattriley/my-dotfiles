@@ -1,40 +1,50 @@
 # My dotfiles
 
-An attempt at increasing the portability of my dotfiles, configs, and scripts.
+Portable shell profiles, helper modules, and small workflow scripts for this machine.
 
-`zsh` is now the default shell on MacOS.
-To change back to `bash`: Terminal > Settings > Shell open with: `/bin/bash`.
+## Overview
+- Default shell: `zsh`
+- Repository path assumed by the managed profiles: `/Users/mattriley/Home/Code/my-dotfiles`
+- Shared module root: `$DOTFILES_DIR/src/bash/modules`
 
-To set iterm shell to bash: Profiles > Command > Custom Shell: `/bin/bash`
+To switch Terminal back to bash on macOS:
+- Terminal > Settings > Shell open with: `/bin/bash`
 
-## Smoke test
-Run `./smoke-test` to verify the shell modules load and the key failure paths still behave safely (does not write to `$HOME`).
+To switch iTerm back to bash:
+- Profiles > Command > Custom Shell: `/bin/bash`
 
-## Install / Pull plans
-Use `./install-shell-profile --list` (or `--plan`) to see which files would be symlinked into `$HOME` without changing anything.
-Use `./pull-shell-profile --list` (or `--plan`) to see which files would be copied back into `src/` without changing anything.
+## Usage
+### Validation
+Run `./smoke-test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
+
+### Profile planning
+Use `./install-shell-profile --list` or `./install-shell-profile --plan` to see which files would be symlinked into `$HOME`.
+
+Use `./pull-shell-profile --list` or `./pull-shell-profile --plan` to see which files would be copied back into `src/`.
+
 Use `--profile all` with `install-shell-profile`, `pull-shell-profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
 
-## Shell setup
-The managed shell profiles currently assume this repo lives at `/Users/mattriley/Home/Code/my-dotfiles`.
-
-They set:
+## Configuration
+The managed profiles currently set:
 - `DOTFILES_DIR=/Users/mattriley/Home/Code/my-dotfiles`
 - `BASH_MODULES=$DOTFILES_DIR/src/bash/modules`
 
-If that repo path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load the shared modules from the correct location.
+If the repository path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load shared modules from the correct location.
 
-## CI
-GitHub Actions runs `shellcheck` and `./smoke-test` on every push and pull request.
+## Quality Checks
+GitHub Actions runs:
+- `shellcheck`
+- shell syntax validation with `bash -n` and `zsh -n`
+- `./smoke-test`
 
-## Principles
-Use these as the default guide for future changes so the repo stays internally consistent.
+These checks run on every push and pull request.
 
+## Design Principles
 - Prefer explicit configuration over discovery. If a path or dependency matters, set it directly instead of inferring it from fragile filesystem assumptions.
 - Keep non-interactive shells quiet. Startup files should avoid decorative output or warnings in scripted contexts unless something is genuinely broken.
-- Fail safely when optional tools are missing. Shell helpers should return cleanly when commands like `nodenv`, `nvm`, `code`, or `osascript` are unavailable.
 - Treat interactive and non-interactive shells differently on purpose. Prompts, banners, and interactive UX belong only in interactive sessions.
-- Avoid destructive defaults. Helpers should prefer no-op or clear failure over aggressive behavior when inputs are missing or ambiguous.
+- Fail safely when optional tools are missing. Shell helpers should return cleanly when commands such as `nodenv`, `nvm`, `code`, or `osascript` are unavailable.
+- Avoid destructive defaults. Helpers should prefer a no-op or clear failure over aggressive behavior when inputs are missing or ambiguous.
 - Make empty cases valid. Commands that scan directories or profiles should handle “nothing found” without noisy glob or `find` errors.
 - Prefer explicit contracts and shared boundaries. Use environment variables and clear helper/function boundaries rather than hidden coupling, duplicated control flow, or deep auto-discovery.
 - Prefer thin entrypoints and shared helpers. Keep top-level scripts and shell profiles focused on orchestration; move repeated logic into shared helper files.
@@ -46,28 +56,28 @@ Use these as the default guide for future changes so the repo stays internally c
 - Back changes with checks. If a bug or regression matters, add or extend `smoke-test` so the behavior is enforced automatically.
 - Keep shell code lint-clean. Treat `shellcheck` warnings as design feedback, not just formatting noise.
 
-## Code Conventions
+## Coding Standards
+### General conventions
 - Prefer small shell functions with one clear responsibility.
-- Keep top-level scripts readable from top to bottom: parse args, define helpers, run the main flow.
+- Keep top-level scripts readable from top to bottom: parse arguments, define helpers, run the main flow.
 - Name shared helpers by domain to make ownership obvious: `dotfiles.*`, `node.*`, `util.*`, `prompt.*`, and so on.
 - When a module depends on another local helper, source it defensively so the module can still be used on its own.
-- Quote variable expansions unless unquoted behavior is explicitly required.
 - Prefer early returns over deep nesting in shell functions.
-- Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and smoke-test messages.
+- Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke-test` messages.
 - Prefer adding a shared helper over copying a block for the third time.
-- Keep test assertions direct and high-signal: check the externally observable behavior, not incidental implementation details.
+- Keep test assertions direct and high-signal. Check externally observable behavior, not incidental implementation details.
 
-## Code Style
-- Use 4-space indentation in shell scripts; do not mix tabs and spaces.
+### Formatting and style
+- Use 4-space indentation in shell scripts. Do not mix tabs and spaces.
 - Prefer multi-line functions and control flow over compressed one-liners when the logic is more than trivial.
-- Keep blank lines meaningful: separate setup, validation, main logic, and cleanup.
+- Keep blank lines meaningful. Separate setup, validation, main logic, and cleanup.
 - Prefer local variables inside functions unless the value is intentionally part of the shared shell environment.
 - Use descriptive variable names for temporary values when they carry meaning beyond a single command.
 - Keep comments short and operational. Explain why something exists or what edge case is being handled, not what the syntax already says.
 - Prefer consistent guard patterns such as `command || return`, `check || exit 1`, and explicit `if` blocks for user-facing failures.
 - Keep output strings and error messages sentence-like and consistent so tests and CLI behavior stay predictable.
 
-### Statement Style
+### Statement style
 - Declare functions as `function name { ... }`.
 - Do not use trailing `()` in function declarations.
 - Put the opening `{` on the same line as the function name.
