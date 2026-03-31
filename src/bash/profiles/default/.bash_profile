@@ -38,18 +38,22 @@ elif [ "$is_interactive" -eq 1 ]; then
     echo "Shell: bash"
 fi
 
-if [ -z "${DOTFILES_DIR:-}" ]; then
-    if [ "$is_interactive" -eq 1 ]; then
-        echo "Error: DOTFILES_DIR is not set" >&2
-    fi
-    export BASH_MODULES="${BASH_MODULES:-}"
-elif [ ! -d "$DOTFILES_DIR" ]; then
-    if [ "$is_interactive" -eq 1 ]; then
-        echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
-    fi
-    export BASH_MODULES="${BASH_MODULES:-}"
+if declare -f dotfiles.validate_dotfiles_dir >/dev/null 2>&1; then
+    dotfiles.validate_dotfiles_dir "$is_interactive" || true
 else
-    export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
+    if [ -z "${DOTFILES_DIR:-}" ]; then
+        if [ "$is_interactive" -eq 1 ]; then
+            echo "Error: DOTFILES_DIR is not set" >&2
+        fi
+        export BASH_MODULES="${BASH_MODULES:-}"
+    elif [ ! -d "$DOTFILES_DIR" ]; then
+        if [ "$is_interactive" -eq 1 ]; then
+            echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
+        fi
+        export BASH_MODULES="${BASH_MODULES:-}"
+    else
+        export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
+    fi
 fi
 if declare -f dotfiles.export_profile_env >/dev/null 2>&1; then
     dotfiles.export_profile_env

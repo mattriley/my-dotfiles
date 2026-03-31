@@ -8,6 +8,14 @@ dotfiles.is_interactive() {
     esac
 }
 
+dotfiles.path_append_once() {
+    local entry="$1"
+    case ":$PATH:" in
+        *":$entry:"*) ;;
+        *) export PATH="$PATH:$entry" ;;
+    esac
+}
+
 dotfiles.has_function() {
     local fn="$1"
 
@@ -16,6 +24,25 @@ dotfiles.has_function() {
     else
         declare -f "$fn" >/dev/null 2>&1
     fi
+}
+
+dotfiles.validate_dotfiles_dir() {
+    local is_interactive="$1"
+
+    if [ -z "${DOTFILES_DIR:-}" ]; then
+        [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR is not set" >&2
+        export BASH_MODULES="${BASH_MODULES:-}"
+        return 1
+    fi
+
+    if [ ! -d "$DOTFILES_DIR" ]; then
+        [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
+        export BASH_MODULES="${BASH_MODULES:-}"
+        return 1
+    fi
+
+    export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
+    return 0
 }
 
 dotfiles.load_modules() {

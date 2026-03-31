@@ -12,14 +12,20 @@ fi
 
 export DOTFILES_ZSHRC_LOADED=1
 
-if [ -z "${DOTFILES_DIR:-}" ]; then
-    case $- in
-        *i*) echo "Error: DOTFILES_DIR is not set" >&2 ;;
-    esac
-elif [ ! -d "$DOTFILES_DIR" ]; then
-    case $- in
-        *i*) echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2 ;;
-    esac
+if whence dotfiles.validate_dotfiles_dir >/dev/null 2>&1; then
+    dotfiles.validate_dotfiles_dir "$is_interactive" || true
+else
+    if [ -z "${DOTFILES_DIR:-}" ]; then
+        case $- in
+            *i*) echo "Error: DOTFILES_DIR is not set" >&2 ;;
+        esac
+    elif [ ! -d "$DOTFILES_DIR" ]; then
+        case $- in
+            *i*) echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2 ;;
+        esac
+    else
+        export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
+    fi
 fi
 
 if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then

@@ -1,21 +1,24 @@
 #!/bin/bash
 
 export DOTFILES_DIR="/Users/mattriley/Home/Code/my-dotfiles"
-export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
 
-path_append_once() {
-    local entry="$1"
-    case ":$PATH:" in
-        *":$entry:"*) ;;
-        *) export PATH="$PATH:$entry" ;;
-    esac
-}
+if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then
+    source "$DOTFILES_DIR/src/bash/profile-common.sh"
+fi
 
 # Homebrew (brew)
-path_append_once "/opt/homebrew/bin"
+if declare -f dotfiles.path_append_once >/dev/null 2>&1; then
+    dotfiles.path_append_once "/opt/homebrew/bin"
+else
+    export PATH="$PATH:/opt/homebrew/bin"
+fi
 
 # Visual Studio Code (code)
-path_append_once "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+if declare -f dotfiles.path_append_once >/dev/null 2>&1; then
+    dotfiles.path_append_once "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+else
+    export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+fi
 
 # Local overrides (optional)
 # shellcheck disable=SC1091
