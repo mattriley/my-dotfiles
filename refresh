@@ -33,10 +33,8 @@ else
 fi
 
 # Provide sane defaults when `refresh` is run outside a shell startup.
-: "${HOME_DIR:=$HOME/Home}"
-: "${SCREENCAPTURE_DIR:=$HOME_DIR/Screenshots}"
-: "${MY_AUTHOR_NAME:=Matt Riley}"
-: "${MY_AUTHOR_EMAIL:=m@ttriley.dev}"
+: "${DOTFILES_DIR:=$SCRIPT_DIR}"
+[ -f "$DOTFILES_DIR/dotfiles-personal.sh" ] && source "$DOTFILES_DIR/dotfiles-personal.sh"
 
 if [ "$DRY_RUN" -eq 0 ]; then
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
