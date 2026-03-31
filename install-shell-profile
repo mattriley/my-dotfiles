@@ -94,5 +94,34 @@ function install_shell_profile {
     echo
 }
 
+function install_profiles {
+    local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
+    local profiles=()
+    local status=0
+    local profile_dir
+
+    if [ "$PROFILE" = "all" ] || [ -z "$PROFILE" ]; then
+        shopt -s nullglob
+        for profile_dir in "$profiles_dir"/*; do
+            [ -d "$profile_dir" ] || continue
+            profiles+=("$(basename "$profile_dir")")
+        done
+        shopt -u nullglob
+    else
+        profiles=("$PROFILE")
+    fi
+
+    [ "${#profiles[@]}" -gt 0 ] || {
+        echo "Error: no profiles found in $profiles_dir" >&2
+        return 1
+    }
+
+    for profile_dir in "${profiles[@]}"; do
+        install_shell_profile "$profile_dir" || status=1
+    done
+
+    return "$status"
+}
+
 echo
-install_shell_profile "$PROFILE"
+install_profiles

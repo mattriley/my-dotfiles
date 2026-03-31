@@ -183,6 +183,24 @@ if [ "$out" != "status:0" ]; then
   failures=$((failures+1))
 fi
 
+echo "OK: install-shell-profile supports --profile all in plan mode"
+out="$(
+  bash --noprofile --norc "$SCRIPT_DIR/install-shell-profile" --list --profile all 2>&1
+)"
+if [[ "$out" == *"Error: profile directory not found"* ]]; then
+  echo "FAIL: install-shell-profile should expand --profile all: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: pull-shell-profile supports --profile all in plan mode"
+out="$(
+  bash --noprofile --norc "$SCRIPT_DIR/pull-shell-profile" --list --profile all 2>&1
+)"
+if [[ "$out" == *"Error: profile directory not found"* ]]; then
+  echo "FAIL: pull-shell-profile should expand --profile all: $out" >&2
+  failures=$((failures+1))
+fi
+
 if [ "$failures" -gt 0 ]; then
   echo "Smoke test finished with $failures failure(s)." >&2
   exit 1
