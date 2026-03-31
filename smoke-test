@@ -286,8 +286,11 @@ require_func "flib.group"
 require_func "gcu"
 require_func "git.push"
 require_func "git.set_author"
+require_func "git.set_author.default"
 require_func "macos.set_screencapture_location"
+require_func "macos.set_screencapture_location.default"
 require_func "vscode.install-extensions"
+require_func "vscode.install-extensions.default"
 require_func "vscode.sort_settings"
 require_func "vscode.setup-shell-command"
 
@@ -389,14 +392,14 @@ out="$(
   bash --noprofile --norc -c '
     source "$1"
     unset MY_VSCODE_EXTENSIONS
-    output="$(vscode.install-extensions 2>&1)"
+    output="$(vscode.install-extensions.default 2>&1)"
     if [ -n "$output" ]; then
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
   ' _ "$MODULES_DIR/vscode/install-extensions.sh"
 )"
-expect_eq "$out" "status:0" "vscode.install-extensions should no-op cleanly"
+expect_eq "$out" "status:0" "vscode.install-extensions.default should no-op cleanly"
 
 echo "OK: vscode.install-extensions accepts an explicit extension list"
 out="$(

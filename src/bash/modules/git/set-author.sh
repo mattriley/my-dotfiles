@@ -13,3 +13,7 @@ function git.set_author {
     git config --global user.email "$author_email" || return 1
 
 }
+
+function git.set_author.default {
+    git.set_author "${MY_AUTHOR_NAME:-}" "${MY_AUTHOR_EMAIL:-}"
+}

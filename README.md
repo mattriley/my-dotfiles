@@ -71,6 +71,7 @@ These checks run on every push and pull request.
 - Guard shared-helper usage at bootstrap boundaries only. It is reasonable to check whether a shared file or bootstrap helper has loaded before first use in startup code.
 - Do not scatter repeated function-existence checks through normal control flow. Once a shared helper file is loaded, call its functions directly and treat missing helpers as a structural error.
 - Keep dependency assumptions explicit. If a file depends on shared module helpers, rely on documented loader order rather than hidden self-sourcing.
+- For action-style helpers, prefer an explicit base function plus a `.default` wrapper. The base function should take concrete arguments, while the `.default` wrapper may read matching values from the shell environment.
 - Prefer early returns over deep nesting in shell functions.
 - Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke-test` messages.
 - Prefer adding a shared helper over copying a block for the third time.

@@ -20,3 +20,7 @@ function macos.set_screencapture_location {
     fi
 
 }
+
+function macos.set_screencapture_location.default {
+    macos.set_screencapture_location "${SCREENCAPTURE_DIR:-}"
+}

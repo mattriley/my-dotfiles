@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function vscode.install-extensions {
-    local extensions="${1:-${MY_VSCODE_EXTENSIONS:-}}"
+    local extensions="$1"
 
     [ -n "$extensions" ] || return 0
     util.has_command code || return 1
@@ -13,4 +13,8 @@ function vscode.install-extensions {
         code --install-extension "$extension"
     done
 
+}
+
+function vscode.install-extensions.default {
+    vscode.install-extensions "${MY_VSCODE_EXTENSIONS:-}"
 }
