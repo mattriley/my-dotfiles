@@ -61,9 +61,10 @@ These checks run on every push and pull request.
 - Prefer small shell functions with one clear responsibility.
 - Keep top-level scripts readable from top to bottom: parse arguments, define helpers, run the main flow.
 - Name shared helpers by domain to make ownership obvious: `dotfiles.*`, `node.*`, `util.*`, `prompt.*`, and so on.
-- When a module depends on another local helper, source it defensively so the module can still be used on its own.
+- When a module depends on another local helper, it may self-source that dependency at the top so the module can still be used on its own.
 - Guard shared-helper usage at bootstrap boundaries only. It is reasonable to check whether a shared file or bootstrap helper has loaded before first use in startup code.
 - Do not scatter repeated function-existence checks through normal control flow. Once a shared helper file is loaded, call its functions directly and treat missing helpers as a structural error.
+- Keep defensive self-sourcing local to the module boundary. Do not repeat `declare -f` or `whence` checks throughout the module after the dependency has been loaded.
 - Prefer early returns over deep nesting in shell functions.
 - Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke-test` messages.
 - Prefer adding a shared helper over copying a block for the third time.
@@ -102,3 +103,4 @@ These checks run on every push and pull request.
 - Quote here-doc delimiters when interpolation is not intended, for example `<<'EOF'`.
 - Guard optional `source` calls with `[ -f ... ]` or a shared helper so startup stays quiet.
 - Prefer shared helpers for repeated shell mechanics such as command checks or path mutation.
+- Use defensive `source` blocks only at dependency boundaries, for example when making a module safely sourceable on its own.

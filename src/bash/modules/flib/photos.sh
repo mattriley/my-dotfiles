@@ -2,7 +2,7 @@
 
 function flib.photos {
 
-    local profile=${1:-$PHOTOS_DEFAULT_PROFILE}
+    local profile="${1:-$PHOTOS_DEFAULT_PROFILE}"
     local photos_dir="$PHOTOS_PARTIAL_PATH$profile"
     local node_version_file="$CODE_DIR/flib/.node-version"
 

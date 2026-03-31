@@ -13,7 +13,7 @@ function vscode.install-extensions {
 
     IFS="|" read -r -a arr <<< "$MY_VSCODE_EXTENSIONS"
 
-    for extension in "${arr[@]}"; do 
+    for extension in "${arr[@]}"; do
         [ -n "$extension" ] || continue
         code --install-extension "$extension"
     done
