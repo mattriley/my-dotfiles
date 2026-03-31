@@ -6,7 +6,12 @@ if [ -z "$BASH_VERSION" ]; then
     return 0
 fi
 
-echo "Shell: bash"
+case $- in
+    *i*) is_interactive=1 ;;
+    *) is_interactive=0 ;;
+esac
+
+[ "$is_interactive" -eq 1 ] && echo "Shell: bash"
 
 export NODE_OPTIONS="--max_old_space_size=32768"
 export UV_THREADPOOL_SIZE=80
@@ -83,7 +88,7 @@ if declare -f display.is-highres >/dev/null 2>&1; then
     display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 fi
 
-if declare -f prompt.dev >/dev/null 2>&1; then
+if [ "$is_interactive" -eq 1 ] && declare -f prompt.dev >/dev/null 2>&1; then
     prompt.dev
 fi
 

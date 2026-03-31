@@ -6,7 +6,12 @@ source "$HOME/.bashrc"
 # Intentionally do not source `.bash_profile` here:
 # it is bash-specific and returns immediately under zsh.
 
-echo "Shell: zsh"
+case $- in
+    *i*) is_interactive=1 ;;
+    *) is_interactive=0 ;;
+esac
+
+[ "$is_interactive" -eq 1 ] && echo "Shell: zsh"
 
 # Initialize nvm (if installed) so `node`/`npm` match your desired version in zsh.
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
