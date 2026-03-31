@@ -13,6 +13,12 @@ esac
 
 [ "$is_interactive" -eq 1 ] && echo "Shell: zsh"
 
+if [ -z "${DOTFILES_DIR:-}" ]; then
+    [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR is not set" >&2
+elif [ ! -d "$DOTFILES_DIR" ]; then
+    [ "$is_interactive" -eq 1 ] && echo "Error: DOTFILES_DIR does not exist: $DOTFILES_DIR" >&2
+fi
+
 # Load shared shell modules when the repo path is configured.
 if [ -d "${BASH_MODULES:-}" ]; then
     setopt local_options null_glob

@@ -310,6 +310,23 @@ if command -v zsh >/dev/null 2>&1; then
     echo "FAIL: interactive .zshrc should apply prompt.dev: $out" >&2
     failures=$((failures+1))
   fi
+
+  echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
+  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  cat > "$tmp_home/.bashrc" <<'EOF'
+#!/bin/bash
+export DOTFILES_DIR="/no/such/dotfiles"
+export BASH_MODULES="$DOTFILES_DIR/src/bash/modules"
+EOF
+  out="$(
+    HOME="$tmp_home" zsh -i -c exit 2>&1
+  )"
+  rm -rf "$tmp_home"
+  if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
+    echo "FAIL: interactive .zshrc should warn on invalid DOTFILES_DIR: $out" >&2
+    failures=$((failures+1))
+  fi
 else
   echo "SKIP: zsh is not installed"
 fi
