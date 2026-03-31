@@ -6,14 +6,25 @@ on:
 
 jobs:
   shell:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y shellcheck zsh
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install shellcheck
 
       - name: Lint shell scripts
         run: shellcheck refresh install-shell-profile pull-shell-profile smoke-test src/bash/modules/**/*.sh src/bash/profiles/default/.bashrc
