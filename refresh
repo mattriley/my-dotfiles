@@ -33,7 +33,9 @@ while [ $# -gt 0 ]; do
 done
 
 function sort_vscode_settings {
-    command -v node >/dev/null 2>&1 || return 0
+    if [ "$DRY_RUN" -eq 0 ]; then
+        command -v node >/dev/null 2>&1 || return 0
+    fi
 
     local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
     [ -d "$profiles_dir" ] || return 0
@@ -65,9 +67,9 @@ function sort_vscode_settings {
 }
 
 function set_git_author {
+    [ "$DRY_RUN" -eq 1 ] && return 0
     command -v git >/dev/null 2>&1 || return 0
 
-    [ "$DRY_RUN" -eq 1 ] && return 0
     [ -n "$MY_AUTHOR_NAME" ] || return 0
     [ -n "$MY_AUTHOR_EMAIL" ] || return 0
 
@@ -76,10 +78,10 @@ function set_git_author {
 }
 
 function set_screencapture_location {
+    [ "$DRY_RUN" -eq 1 ] && return 0
     command -v defaults >/dev/null 2>&1 || return 0
     command -v killall >/dev/null 2>&1 || return 0
 
-    [ "$DRY_RUN" -eq 1 ] && return 0
     if [ -n "$SCREENCAPTURE_DIR" ] && [ -d "$SCREENCAPTURE_DIR" ]; then
         if defaults write com.apple.screencapture location "$SCREENCAPTURE_DIR"; then
             killall SystemUIServer 2>/dev/null || true
@@ -94,10 +96,11 @@ function set_screencapture_location {
     fi
 }
 
+overall_status=0
 if [ "$DRY_RUN" -eq 1 ]; then
-    "$SCRIPT_DIR/install-shell-profile" --dry-run --profile "$PROFILE"
+    "$SCRIPT_DIR/install-shell-profile" --dry-run --profile "$PROFILE" || overall_status=1
 else
-    "$SCRIPT_DIR/install-shell-profile" --profile "$PROFILE"
+    "$SCRIPT_DIR/install-shell-profile" --profile "$PROFILE" || overall_status=1
 fi
 
 # Provide sane defaults when `refresh` is run outside a shell startup.
@@ -106,6 +109,13 @@ fi
 : "${MY_AUTHOR_NAME:=Matt Riley}"
 : "${MY_AUTHOR_EMAIL:=m@ttriley.dev}"
 
-sort_vscode_settings
-set_git_author
-set_screencapture_location
+sort_vscode_settings || overall_status=1
+set_git_author || overall_status=1
+set_screencapture_location || overall_status=1
+
+if [ "$overall_status" -ne 0 ]; then
+    echo "refresh: finished with errors (profile=$PROFILE, dry-run=$DRY_RUN)." >&2
+    exit "$overall_status"
+fi
+
+echo "refresh: OK (profile=$PROFILE, dry-run=$DRY_RUN)"
