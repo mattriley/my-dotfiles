@@ -37,5 +37,6 @@ Use these as the default guide for future changes so the repo stays internally c
 - Avoid destructive defaults. Helpers should prefer no-op or clear failure over aggressive behavior when inputs are missing or ambiguous.
 - Make empty cases valid. Commands that scan directories or profiles should handle “nothing found” without noisy glob or `find` errors.
 - Prefer simple shell contracts. Use environment variables and clear function boundaries rather than hidden coupling or deep auto-discovery.
+- Minimize incidental dependencies. Prefer built-in shell features and standard utilities over extra tools unless they materially improve correctness or keep the code simpler.
 - Back changes with checks. If a bug or regression matters, add or extend `smoke-test` so the behavior is enforced automatically.
 - Keep shell code lint-clean. Treat `shellcheck` warnings as design feedback, not just formatting noise.

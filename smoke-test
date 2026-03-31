@@ -274,7 +274,7 @@ out="$(
   HOME="$tmp_home" bash --rcfile "$tmp_home/.bash_profile" -i -c 'source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit' 2>&1
 )"
 rm -rf "$tmp_home"
-if [ "$(printf '%s\n' "$out" | rg -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
+if [ "$(printf '%s\n' "$out" | grep -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
   echo "FAIL: .bash_profile should only initialize once: $out" >&2
   failures=$((failures+1))
 fi
@@ -349,7 +349,7 @@ EOF
     HOME="$tmp_home" zsh -i -c 'source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"' 2>&1
   )"
   rm -rf "$tmp_home"
-  if [ "$(printf '%s\n' "$out" | rg -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
+  if [ "$(printf '%s\n' "$out" | grep -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
     echo "FAIL: .zshrc should only initialize once: $out" >&2
     failures=$((failures+1))
   fi
