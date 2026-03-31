@@ -75,7 +75,18 @@ Use these as the default guide for future changes so the repo stays internally c
 - Prefer `local` for function-scoped variables.
 - Prefer `$(...)` over backticks for command substitution.
 - Prefer `[ ... ]` for simple tests and `[[ ... ]]` only when pattern matching or regex is actually needed.
+- Put spaces inside test brackets: `[ -n "$value" ]`, not `[-n "$value"]`.
+- Prefer `${var:-default}` or `${var:=default}` when a simple parameter default is enough.
+- Quote parameter expansions in assignments and command arguments unless unquoted behavior is required.
 - Use `return` inside functions and `exit` only in true script entrypoints.
 - Prefer `printf` when output format matters; use `echo` for simple status messages.
 - Keep one command per line unless a short guard form such as `check || return 1` is clearly simpler.
 - Prefer explicit multi-line `if` blocks when the branch has more than one meaningful step.
+- Prefer `case` over long `if` / `elif` chains for argument parsing and enum-like branching.
+- Use `read -r` by default.
+- Scope `IFS` changes as narrowly as possible.
+- Prefer arrays over word-splitting strings when representing lists of paths or arguments.
+- Prefer null-delimited loops for file paths when using `find`.
+- Quote here-doc delimiters when interpolation is not intended, for example `<<'EOF'`.
+- Guard optional `source` calls with `[ -f ... ]` or a shared helper so startup stays quiet.
+- Prefer shared helpers for repeated shell mechanics such as command checks or path mutation.
