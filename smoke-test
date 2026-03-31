@@ -41,6 +41,8 @@ require_func "node.nvm.setup"
 require_func "node.nodenv.setup"
 require_func "node.extract_node_modules"
 require_func "node.restore_node_modules"
+require_func "node.list_node_modules"
+require_func "node.list_dep_mismatch"
 require_func "flib.photos"
 require_func "gcu"
 require_func "git.push"
@@ -95,6 +97,24 @@ out="$(
 rm -rf "$empty_code_dir" "$empty_temp_dir"
 if [ "$out" != "status:0" ]; then
   echo "FAIL: node.extract_node_modules should no-op cleanly: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: node.list_node_modules is quiet when there is nothing to list"
+empty_code_dir="$(mktemp -d /tmp/my-dotfiles-smoke-code.XXXXXX)"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    output="$(node.list_node_modules "$2" 2>&1)"
+    if [ -n "$output" ]; then
+      printf "%s\n" "$output"
+    fi
+    printf "status:%s" "$?"
+  ' _ "$MODULES_DIR/node/list-node-modules.sh" "$empty_code_dir"
+)"
+rm -rf "$empty_code_dir"
+if [ "$out" != "status:0" ]; then
+  echo "FAIL: node.list_node_modules should no-op cleanly: $out" >&2
   failures=$((failures+1))
 fi
 

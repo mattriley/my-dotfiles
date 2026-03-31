@@ -2,6 +2,15 @@
 
 function net.kill_port { 
 
-    lsof -i TCP:"$1" | grep LISTEN | awk '{print $2}' | xargs kill -9 
+    local port="$1"
+    local pids=()
+
+    while IFS= read -r pid; do
+        [ -n "$pid" ] && pids+=("$pid")
+    done < <(lsof -tiTCP:"$port" -sTCP:LISTEN)
+
+    [ "${#pids[@]}" -gt 0 ] || return 0
+
+    kill "${pids[@]}"
 
 }
