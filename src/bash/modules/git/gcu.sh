@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function git.commit {
+function gcu {
 
     local message=${1:-"Unspecified changes"}
     git add -A
