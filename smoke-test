@@ -62,6 +62,7 @@ function setup_temp_profile_home {
   if [ "$shell_name" = "bash" ]; then
     cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   else
+    cp "$SCRIPT_DIR/src/bash/profiles/default/.zprofile" "$tmp_home/.zprofile"
     cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
   fi
 }
@@ -160,6 +161,34 @@ function assert_zsh_profile_noninteractive_clean {
   rm -rf "$tmp_home"
   expect_not_contains "$out" "command not found" ".zshrc should not require missing helper functions"
   expect_not_contains "$out" "Shell: zsh" ".zshrc should stay quiet in non-interactive shells"
+}
+
+function assert_zprofile_requires_zshrc {
+  local tmp_home
+  local out
+
+  echo "OK: .zprofile fails clearly when .zshrc is missing"
+  tmp_home="$(make_temp_home)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.zprofile" "$tmp_home/.zprofile"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zprofile"')"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "Error: missing required file: $tmp_home/.zshrc" ".zprofile should require .zshrc"
+}
+
+function assert_zprofile_loads_zshrc {
+  local tmp_home
+  local out
+
+  echo "OK: .zprofile proxies to .zshrc"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zprofile"; alias gs >/dev/null 2>&1; echo gs:$?; print -r -- "zprofile_loaded:$DOTFILES_ZPROFILE_LOADED"; print -r -- "zshrc_loaded:$DOTFILES_ZSHRC_LOADED"')"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "gs:0" ".zprofile should load .zshrc"
+  expect_contains "$out" "zprofile_loaded:1" ".zprofile should mark itself as loaded"
+  expect_contains "$out" "zshrc_loaded:1" ".zprofile should load .zshrc"
 }
 
 function assert_zsh_profile_loads_modules {
@@ -385,6 +414,8 @@ assert_bash_profile_unset_dotfiles_dir_quiet
 assert_bash_profile_idempotent
 
 if command -v zsh >/dev/null 2>&1; then
+  assert_zprofile_requires_zshrc
+  assert_zprofile_loads_zshrc
   assert_zsh_profile_noninteractive_clean
   assert_zsh_profile_loads_modules
   assert_zsh_profile_applies_prompt

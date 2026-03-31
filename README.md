@@ -29,6 +29,7 @@ The managed profiles currently set:
 - `DOTFILES_DIR=/Users/mattriley/Home/Code/my-dotfiles`
 - `BASH_MODULES=$DOTFILES_DIR/src/bash/modules`
 - `.bash_profile` requires `.bashrc`; bash initialization lives in `.bashrc`, while `.bash_profile` is only the login-shell wrapper
+- `.zprofile` requires `.zshrc`; zsh initialization lives in `.zshrc`, while `.zprofile` is only the login-shell wrapper
 
 If the repository path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load shared modules from the correct location.
 
