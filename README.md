@@ -15,6 +15,15 @@ Use `./install-shell-profile --list` (or `--plan`) to see which files would be s
 Use `./pull-shell-profile --list` (or `--plan`) to see which files would be copied back into `src/` without changing anything.
 Use `--profile all` with `install-shell-profile`, `pull-shell-profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
 
+## Shell setup
+The managed shell profiles currently assume this repo lives at `/Users/mattriley/Home/Code/my-dotfiles`.
+
+They set:
+- `DOTFILES_DIR=/Users/mattriley/Home/Code/my-dotfiles`
+- `BASH_MODULES=$DOTFILES_DIR/src/bash/modules`
+
+If that repo path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load the shared modules from the correct location.
+
 ## CI
 GitHub Actions runs `shellcheck` and `./smoke-test` on every push and pull request.
 
