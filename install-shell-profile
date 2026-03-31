@@ -3,9 +3,11 @@
 NORM=$(tput sgr0)
 BOLD=$(tput bold)
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 function install_shell_profile {
     local profile="$1"    
-    local target="src/bash/profiles/$profile"
+    local target="$SCRIPT_DIR/src/bash/profiles/$profile"
 
     echo "Installing $BOLD$profile$NORM profile..."
     echo
@@ -17,7 +19,7 @@ function install_shell_profile {
             # Skip editor/system cruft so it doesn't get installed into $HOME
             [ "$base" = ".DS_Store" ] && continue
             mkdir -p "$(dirname "$dest")"
-            ln -sfv "$(pwd)/$path" "$dest"
+            ln -sfv "$path" "$dest"
         done
 
     echo

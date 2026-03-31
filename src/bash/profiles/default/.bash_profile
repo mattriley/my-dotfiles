@@ -1,13 +1,12 @@
 #!/bin/bash
 # shellcheck disable=SC1090,SC1091,SC2155
 
-# Check if the shell is Bash
-if [ -n "$BASH_VERSION" ]; then
-    echo "Shell is Bash"
-else
-    echo "Shell is not Bash"
-    return
+# Only run under bash (zsh should not source this file, but keep it safe).
+if [ -z "$BASH_VERSION" ]; then
+    return 0
 fi
+
+echo "Shell: bash"
 
 export NODE_OPTIONS="--max_old_space_size=32768"
 export UV_THREADPOOL_SIZE=80
@@ -51,11 +50,15 @@ export MAGENTA=$(tput setaf 5)
 
 export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 
-for module_path in "$BASH_MODULES/"*; do
-    for script_path in "$module_path/"*.sh; do
-        source "$script_path"
+if [ -d "$BASH_MODULES" ]; then
+    shopt -s nullglob
+    for module_path in "$BASH_MODULES/"*; do
+        for script_path in "$module_path/"*.sh; do
+            source "$script_path"
+        done
     done
-done
+    shopt -u nullglob
+fi
 
 function t { npx -p "task-library" task "$@"; }
 display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"

@@ -3,9 +3,11 @@
 NORM=$(tput sgr0)
 BOLD=$(tput bold)
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 function pull_shell_profile {
     local profile="$1"    
-    local target="src/bash/profiles/$profile"
+    local target="$SCRIPT_DIR/src/bash/profiles/$profile"
 
     echo "Pulling $BOLD$profile$NORM profile..."
     echo
@@ -16,7 +18,10 @@ function pull_shell_profile {
             local base; base="$(basename "$path")"
             # Skip editor/system cruft so it doesn't get pulled into the repo
             [ "$base" = ".DS_Store" ] && continue
-            [ ! -L "$dest" ] && cp "$dest" "$(pwd)/$path"
+            # Only pull regular files (avoid overwriting repo-managed symlinks).
+            [ ! -L "$dest" ] || continue
+            [ -e "$dest" ] || continue
+            cp -f "$dest" "$path"
         done
 
     echo
