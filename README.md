@@ -48,7 +48,7 @@ These checks run on every push and pull request.
 - Make empty cases valid. Commands that scan directories or profiles should handle “nothing found” without noisy glob or `find` errors.
 - Prefer explicit contracts and shared boundaries. Use environment variables and clear helper/function boundaries rather than hidden coupling, duplicated control flow, or deep auto-discovery.
 - Prefer thin entrypoints and shared helpers. Keep top-level scripts and shell profiles focused on orchestration; move repeated logic into shared helper files.
-- Keep modules standalone when practical. If a module depends on shared helper code, it should still be safe to source on its own.
+- Load module directories alphabetically as ordered sets. Shared helpers should load before dependent files by filename, rather than each file self-sourcing its own prerequisites.
 - Minimize incidental dependencies. Prefer built-in shell features and standard utilities over extra tools unless they materially improve correctness or keep the code simpler.
 - Share behavior before adding variants. If bash and zsh, or install and pull, need the same logic, consolidate it before making shell-specific tweaks.
 - Preserve behavior while simplifying structure. Broad refactors should reduce duplication without changing user-visible output unless that change is intentional and tested.
@@ -61,10 +61,10 @@ These checks run on every push and pull request.
 - Prefer small shell functions with one clear responsibility.
 - Keep top-level scripts readable from top to bottom: parse arguments, define helpers, run the main flow.
 - Name shared helpers by domain to make ownership obvious: `dotfiles.*`, `node.*`, `util.*`, `prompt.*`, and so on.
-- When a module depends on another local helper, it may self-source that dependency at the top so the module can still be used on its own.
+- Use file naming to express load order inside module directories. The loader sources files alphabetically, so shared helpers should use names such as `00-common.sh`.
 - Guard shared-helper usage at bootstrap boundaries only. It is reasonable to check whether a shared file or bootstrap helper has loaded before first use in startup code.
 - Do not scatter repeated function-existence checks through normal control flow. Once a shared helper file is loaded, call its functions directly and treat missing helpers as a structural error.
-- Keep defensive self-sourcing local to the module boundary. Do not repeat `declare -f` or `whence` checks throughout the module after the dependency has been loaded.
+- Keep dependency assumptions explicit. If a file depends on shared module helpers, rely on documented loader order rather than hidden self-sourcing.
 - Prefer early returns over deep nesting in shell functions.
 - Keep user-facing output stable and intentional, especially for `--dry-run`, `--list`, and `smoke-test` messages.
 - Prefer adding a shared helper over copying a block for the third time.
@@ -103,4 +103,4 @@ These checks run on every push and pull request.
 - Quote here-doc delimiters when interpolation is not intended, for example `<<'EOF'`.
 - Guard optional `source` calls with `[ -f ... ]` or a shared helper so startup stays quiet.
 - Prefer shared helpers for repeated shell mechanics such as command checks or path mutation.
-- Use defensive `source` blocks only at dependency boundaries, for example when making a module safely sourceable on its own.
+- In module directories, rely on alphabetical load order and ordered filenames such as `00-common.sh` rather than per-file dependency guards.

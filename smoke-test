@@ -227,17 +227,15 @@ function assert_zsh_profile_idempotent {
 }
 
 shopt -s nullglob
-for module_path in "$MODULES_DIR/"*; do
-  for script_path in "$module_path/"*.sh; do
-    # shellcheck disable=SC1090
-    source "$script_path"
-  done
+for script_path in "$MODULES_DIR"/*/*.sh; do
+  # shellcheck disable=SC1090
+  source "$script_path"
 done
 shopt -u nullglob
 
 function require_func {
   local fn="$1"
-if ! declare -f "$fn" >/dev/null 2>&1; then
+  if ! declare -f "$fn" >/dev/null 2>&1; then
     fail "missing function: $fn"
   else
     echo "OK: $fn"
@@ -320,12 +318,13 @@ empty_temp_dir="$(mktemp -d /tmp/my-dotfiles-smoke-temp.XXXXXX)"
 out="$(
   bash --noprofile --norc -c '
     source "$1"
-    output="$(node.extract_node_modules "$2" "$3" 2>&1)"
+    source "$2"
+    output="$(node.extract_node_modules "$3" "$4" 2>&1)"
     if [ -n "$output" ]; then
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/node/extract-node-modules.sh" "$empty_code_dir" "$empty_temp_dir"
+  ' _ "$MODULES_DIR/node/00-common.sh" "$MODULES_DIR/node/extract-node-modules.sh" "$empty_code_dir" "$empty_temp_dir"
 )"
 rm -rf "$empty_code_dir" "$empty_temp_dir"
 expect_eq "$out" "status:0" "node.extract_node_modules should no-op cleanly"
@@ -335,12 +334,13 @@ empty_code_dir="$(mktemp -d /tmp/my-dotfiles-smoke-code.XXXXXX)"
 out="$(
   bash --noprofile --norc -c '
     source "$1"
-    output="$(node.list_node_modules "$2" 2>&1)"
+    source "$2"
+    output="$(node.list_node_modules "$3" 2>&1)"
     if [ -n "$output" ]; then
       printf "%s\n" "$output"
     fi
     printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/node/list-node-modules.sh" "$empty_code_dir"
+  ' _ "$MODULES_DIR/node/00-common.sh" "$MODULES_DIR/node/list-node-modules.sh" "$empty_code_dir"
 )"
 rm -rf "$empty_code_dir"
 expect_eq "$out" "status:0" "node.list_node_modules should no-op cleanly"

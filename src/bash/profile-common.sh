@@ -52,20 +52,17 @@ function dotfiles.load_modules {
         setopt local_options null_glob
         local script_path
         for script_path in "$BASH_MODULES"/*/*.sh; do
-            # shellcheck disable=SC1090
-            source "$script_path"
+                # shellcheck disable=SC1090
+                source "$script_path"
         done
         return 0
     fi
 
     shopt -s nullglob
-    local module_path
     local script_path
-    for module_path in "$BASH_MODULES/"*; do
-        for script_path in "$module_path/"*.sh; do
-            # shellcheck disable=SC1090
-            source "$script_path"
-        done
+    for script_path in "$BASH_MODULES"/*/*.sh; do
+        # shellcheck disable=SC1090
+        source "$script_path"
     done
     shopt -u nullglob
 }

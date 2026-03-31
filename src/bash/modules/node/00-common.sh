@@ -1,11 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2034
 
-if ! declare -f util.has_command >/dev/null 2>&1; then
-    # shellcheck disable=SC1090,SC1091
-    source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../util" && pwd)/common.sh"
-fi
-
 function node.collect_project_node_modules {
 
     local code_dir="$1"

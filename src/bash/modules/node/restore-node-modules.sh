@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if ! declare -f node.collect_extracted_node_modules_roots >/dev/null 2>&1; then
-    # shellcheck disable=SC1090,SC1091
-    source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
-fi
-
 function node.restore_node_modules {
 
     local code_dir="${1:-$CODE_DIR}"
