@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -u
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MODULES_DIR="$SCRIPT_DIR/src/bash/modules"
+
+echo "Smoke test: loading bash modules (no $HOME writes)"
+
+if [ ! -d "$MODULES_DIR" ]; then
+  echo "FAIL: modules directory not found: $MODULES_DIR" >&2
+  exit 1
+fi
+
+failures=0
+
+shopt -s nullglob
+for module_path in "$MODULES_DIR/"*; do
+  for script_path in "$module_path/"*.sh; do
+    # shellcheck disable=SC1090
+    source "$script_path"
+  done
+done
+shopt -u nullglob
+
+require_func() {
+  local fn="$1"
+  if ! declare -f "$fn" >/dev/null 2>&1; then
+    echo "FAIL: missing function: $fn" >&2
+    failures=$((failures+1))
+  else
+    echo "OK: $fn"
+  fi
+}
+
+require_func "util.trim"
+require_func "git.parse_git_branch"
+require_func "prompt.git_branch"
+require_func "prompt.dev"
+require_func "display.is-highres"
+require_func "node.nvm.setup"
+require_func "node.nodenv.setup"
+
+echo "OK: util.trim output"
+if [ "$(util.trim "  hi  ")" != "hi" ]; then
+  echo "FAIL: util.trim produced unexpected output" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: prompt.git_branch can run"
+if ! out="$(prompt.git_branch 2>/dev/null)"; then
+  echo "FAIL: prompt.git_branch errored" >&2
+  failures=$((failures+1))
+else
+  # We only sanity-check that it returns something like " (branch)" or empty.
+  if [ -n "$out" ] && [[ "$out" != " ("*")" ]]; then
+    echo "FAIL: prompt.git_branch output format unexpected: $out" >&2
+    failures=$((failures+1))
+  fi
+fi
+
+if [ "$failures" -gt 0 ]; then
+  echo "Smoke test finished with $failures failure(s)." >&2
+  exit 1
+fi
+
+echo "Smoke test: PASS"
+
