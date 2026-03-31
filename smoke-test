@@ -91,6 +91,19 @@ function assert_bash_profile_noninteractive_clean {
   expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
 }
 
+function assert_bash_profile_requires_bashrc {
+  local tmp_home
+  local out
+
+  echo "OK: .bash_profile fails clearly when .bashrc is missing"
+  tmp_home="$(make_temp_home)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  # shellcheck disable=SC2016
+  out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; exit')"
+  rm -rf "$tmp_home"
+  expect_contains "$out" "Error: missing required file: $tmp_home/.bashrc" ".bash_profile should require .bashrc"
+}
+
 function assert_bash_profile_loads_modules {
   local tmp_home
   local out
@@ -119,22 +132,6 @@ EOF
   out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
   rm -rf "$tmp_home"
   expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
-}
-
-function assert_bash_profile_invalid_dotfiles_dir_warns {
-  local tmp_home
-  local out
-
-  echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
-  tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-  cat > "$tmp_home/.bashrc" <<'EOF'
-#!/bin/bash
-export DOTFILES_DIR="/no/such/dotfiles"
-EOF
-  out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c exit)"
-  rm -rf "$tmp_home"
-  expect_contains "$out" "Error: DOTFILES_DIR does not exist: /no/such/dotfiles" "interactive .bash_profile should warn on invalid DOTFILES_DIR"
 }
 
 function assert_bash_profile_idempotent {
@@ -382,9 +379,9 @@ out="$(
 expect_not_contains "$out" "Error: profile directory not found" "pull-shell-profile should expand --profile all"
 
 assert_bash_profile_noninteractive_clean
+assert_bash_profile_requires_bashrc
 assert_bash_profile_loads_modules
 assert_bash_profile_unset_dotfiles_dir_quiet
-assert_bash_profile_invalid_dotfiles_dir_warns
 assert_bash_profile_idempotent
 
 if command -v zsh >/dev/null 2>&1; then

@@ -4,6 +4,7 @@ export DOTFILES_DIR="/Users/mattriley/Home/Code/my-dotfiles"
 
 profile_common_loaded=0
 if [ -f "$DOTFILES_DIR/src/bash/profile-common.sh" ]; then
+    # shellcheck disable=SC1091
     source "$DOTFILES_DIR/src/bash/profile-common.sh"
     profile_common_loaded=1
 fi
@@ -77,7 +78,7 @@ if [ -n "${BASH_VERSION:-}" ]; then
     function t { npx -p "task-library" task "$@"; }
 
     if [ "$profile_common_loaded" -eq 1 ] && dotfiles.has_function "display.is-highres"; then
-        display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
+        display.is-highres && export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
         dotfiles.apply_prompt "$is_interactive"
         dotfiles.setup_node
     fi
