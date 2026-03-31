@@ -6,6 +6,12 @@ source "$HOME/.bashrc"
 # Intentionally do not source `.bash_profile` here:
 # it is bash-specific and returns immediately under zsh.
 
+if [ "${DOTFILES_ZSHRC_LOADED:-0}" -eq 1 ]; then
+    return 0
+fi
+
+export DOTFILES_ZSHRC_LOADED=1
+
 case $- in
     *i*) is_interactive=1 ;;
     *) is_interactive=0 ;;

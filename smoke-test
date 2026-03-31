@@ -266,6 +266,19 @@ if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; th
   failures=$((failures+1))
 fi
 
+echo "OK: .bash_profile is idempotent when sourced twice"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+out="$(
+  HOME="$tmp_home" bash --rcfile "$tmp_home/.bash_profile" -i -c 'source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit' 2>&1
+)"
+rm -rf "$tmp_home"
+if [ "$(printf '%s\n' "$out" | rg -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
+  echo "FAIL: .bash_profile should only initialize once: $out" >&2
+  failures=$((failures+1))
+fi
+
 echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
 if command -v zsh >/dev/null 2>&1; then
   tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
@@ -325,6 +338,19 @@ EOF
   rm -rf "$tmp_home"
   if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
     echo "FAIL: interactive .zshrc should warn on invalid DOTFILES_DIR: $out" >&2
+    failures=$((failures+1))
+  fi
+
+  echo "OK: .zshrc is idempotent when sourced twice"
+  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  out="$(
+    HOME="$tmp_home" zsh -i -c 'source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"' 2>&1
+  )"
+  rm -rf "$tmp_home"
+  if [ "$(printf '%s\n' "$out" | rg -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
+    echo "FAIL: .zshrc should only initialize once: $out" >&2
     failures=$((failures+1))
   fi
 else

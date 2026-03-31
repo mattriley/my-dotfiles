@@ -6,6 +6,12 @@ if [ -z "$BASH_VERSION" ]; then
     return 0
 fi
 
+if [ "${DOTFILES_BASH_PROFILE_LOADED:-0}" -eq 1 ]; then
+    return 0
+fi
+
+export DOTFILES_BASH_PROFILE_LOADED=1
+
 case $- in
     *i*) is_interactive=1 ;;
     *) is_interactive=0 ;;
