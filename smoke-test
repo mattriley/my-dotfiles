@@ -268,7 +268,7 @@ if command -v zsh >/dev/null 2>&1; then
     failures=$((failures+1))
   fi
 
-  echo "OK: .zshrc loads shared git aliases"
+  echo "OK: .zshrc loads shared shell modules"
   tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
@@ -278,6 +278,20 @@ if command -v zsh >/dev/null 2>&1; then
   rm -rf "$tmp_home"
   if [[ "$out" != *"gs:0"* ]] || [[ "$out" != *"gr:0"* ]] || [[ "$out" != *"prompt_dev:0"* ]] || [[ "$out" != *"git_parse:0"* ]]; then
     echo "FAIL: .zshrc should load shared shell modules: $out" >&2
+    failures=$((failures+1))
+  fi
+
+  echo "OK: interactive .zshrc applies prompt.dev"
+  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  out="$(
+    HOME="$tmp_home" zsh -i -c 'print -r -- "$PS1"' 2>&1
+  )"
+  rm -rf "$tmp_home"
+  # shellcheck disable=SC2016
+  if [[ "$out" != *'$(prompt.git_branch) $ '* ]]; then
+    echo "FAIL: interactive .zshrc should apply prompt.dev: $out" >&2
     failures=$((failures+1))
   fi
 else

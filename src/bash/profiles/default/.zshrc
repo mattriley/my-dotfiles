@@ -28,3 +28,7 @@ fi
 if whence node.nodenv.setup >/dev/null 2>&1; then
     node.nodenv.setup
 fi
+
+if [ "$is_interactive" -eq 1 ] && whence prompt.dev >/dev/null 2>&1; then
+    prompt.dev
+fi
