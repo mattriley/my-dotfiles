@@ -80,3 +80,51 @@ dotfiles.collect_profiles() {
         return 1
     }
 }
+
+dotfiles.sync_profile_files() {
+    local script_dir="$1"
+    local profile="$2"
+    local action_label="$3"
+    local handler="$4"
+    local target="$script_dir/src/bash/profiles/$profile"
+    local failures=0
+    local processed=0
+    local path
+    local dest
+    local base
+
+    if [ ! -d "$target" ]; then
+        echo "Error: profile directory not found: $target" >&2
+        return 1
+    fi
+
+    echo "$action_label $BOLD$profile$NORM profile..."
+    echo
+
+    while IFS= read -r -d '' path; do
+        dest="$HOME${path#"$target"}"
+        base="$(basename "$path")"
+        DOTFILES_ITERATE_COUNTED=0
+
+        if ! "$handler" "$path" "$dest" "$base"; then
+            failures=$((failures+1))
+        fi
+
+        if [ "${DOTFILES_ITERATE_COUNTED:-0}" -eq 1 ]; then
+            processed=$((processed+1))
+        fi
+    done < <(find "$target" -type f -print0)
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        echo
+        echo "Plan complete: would process $processed file(s)."
+        return 0
+    fi
+
+    if [ "$failures" -gt 0 ]; then
+        echo "Completed with $failures error(s)." >&2
+        return 1
+    fi
+
+    echo
+}

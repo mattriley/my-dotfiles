@@ -6,53 +6,27 @@ source "$SCRIPT_DIR/src/bash/script-common.sh"
 dotfiles.setup_styles
 dotfiles.parse_profile_args "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]" 1 "$@" || exit 1
 
-function install_shell_profile {
-    local profile="$1"    
-    local target="$SCRIPT_DIR/src/bash/profiles/$profile"
+install_profile_file() {
+    local path="$1"
+    local dest="$2"
+    local base="$3"
 
-    if [ ! -d "$target" ]; then
-        echo "Error: profile directory not found: $target" >&2
-        return 1
-    fi
+    # Skip editor/system cruft so it doesn't get installed into $HOME
+    [ "$base" = ".DS_Store" ] && return 0
 
-    echo "Installing $BOLD$profile$NORM profile..."
-    echo
-
-    local failures=0
-    local processed=0
-    while IFS= read -r -d '' path; do 
-            local dest="$HOME${path#"$target"}"
-            local base; base="$(basename "$path")"
-            # Skip editor/system cruft so it doesn't get installed into $HOME
-            [ "$base" = ".DS_Store" ] && continue
-
-            processed=$((processed+1))
-
-            if [ "$DRY_RUN" -eq 1 ]; then
-                if [ "$LIST_ONLY" -eq 1 ]; then
-                    echo "LIST: ln -sfv \"$path\" \"$dest\""
-                else
-                    echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
-                fi
-                continue
-            fi
-
-            mkdir -p "$(dirname "$dest")" || { failures=$((failures+1)); continue; }
-            ln -sfv "$path" "$dest" || failures=$((failures+1))
-        done < <(find "$target" -type f -print0)
+    DOTFILES_ITERATE_COUNTED=1
 
     if [ "$DRY_RUN" -eq 1 ]; then
-        echo
-        echo "Plan complete: would process $processed file(s)."
+        if [ "$LIST_ONLY" -eq 1 ]; then
+            echo "LIST: ln -sfv \"$path\" \"$dest\""
+        else
+            echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
+        fi
         return 0
     fi
 
-    if [ "$failures" -gt 0 ]; then
-        echo "Completed with $failures error(s)." >&2
-        return 1
-    fi
-
-    echo
+    mkdir -p "$(dirname "$dest")" || return 1
+    ln -sfv "$path" "$dest"
 }
 
 function install_profiles {
@@ -63,7 +37,7 @@ function install_profiles {
     dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
 
     for profile_dir in "${DOTFILES_PROFILES[@]}"; do
-        install_shell_profile "$profile_dir" || status=1
+        dotfiles.sync_profile_files "$SCRIPT_DIR" "$profile_dir" "Installing" install_profile_file || status=1
     done
 
     return "$status"
