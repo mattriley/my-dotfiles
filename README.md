@@ -8,8 +8,12 @@ To change back to `bash`: Terminal > Settings > Shell open with: `/bin/bash`.
 To set iterm shell to bash: Profiles > Command > Custom Shell: `/bin/bash`
 
 ## Smoke test
-Run `./smoke-test` to verify the bash module files load correctly (does not write to `$HOME`).
+Run `./smoke-test` to verify the shell modules load and the key failure paths still behave safely (does not write to `$HOME`).
 
 ## Install / Pull plans
 Use `./install-shell-profile --list` (or `--plan`) to see which files would be symlinked into `$HOME` without changing anything.
 Use `./pull-shell-profile --list` (or `--plan`) to see which files would be copied back into `src/` without changing anything.
+Use `--profile all` with `install-shell-profile`, `pull-shell-profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
+
+## CI
+GitHub Actions runs `shellcheck` and `./smoke-test` on every push and pull request.
