@@ -14,6 +14,9 @@ export UV_THREADPOOL_SIZE=80
 
 source "$HOME/.bashrc"
 
+# Local overrides (optional)
+[ -f "$HOME/.bash_profile.local" ] && source "$HOME/.bash_profile.local"
+
 export HOSTVARS="$HOME/.hostvars"
 touch "$HOSTVARS" && source "$HOSTVARS"
 

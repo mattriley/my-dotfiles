@@ -13,6 +13,9 @@ function pull_shell_profile {
     find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
             local dest="$HOME${path#"$target"}"
+            local base; base="$(basename "$path")"
+            # Skip editor/system cruft so it doesn't get pulled into the repo
+            [ "$base" = ".DS_Store" ] && continue
             [ ! -L "$dest" ] && cp "$dest" "$(pwd)/$path"
         done
 

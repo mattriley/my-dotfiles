@@ -13,6 +13,9 @@ function install_shell_profile {
     find "$target" -type f -print0 | 
         while IFS= read -r -d '' path; do 
             local dest="$HOME${path#"$target"}"
+            local base; base="$(basename "$path")"
+            # Skip editor/system cruft so it doesn't get installed into $HOME
+            [ "$base" = ".DS_Store" ] && continue
             mkdir -p "$(dirname "$dest")"
             ln -sfv "$(pwd)/$path" "$dest"
         done
