@@ -17,7 +17,7 @@ source "$HOME/.bashrc"
 [ -f "$HOME/.bash_profile.local" ] && source "$HOME/.bash_profile.local"
 
 export HOSTVARS="$HOME/.hostvars"
-touch "$HOSTVARS" && source "$HOSTVARS"
+[ -f "$HOSTVARS" ] && source "$HOSTVARS"
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
@@ -40,13 +40,30 @@ export PHOTOS_PARTIAL_PATH="$HOME_DIR/Photos › "
 export PHOTOS_DEFAULT_PROFILE="Matt"
 export SCREENCAPTURE_DIR="$HOME_DIR/Screenshots"
 
-export NORM=$(tput sgr0)
-export BOLD=$(tput bold)
-export RED=$(tput setaf 1)
-export GREEN=$(tput setaf 2)
-export YELLOW=$(tput setaf 3)
-export BLUE=$(tput setaf 4)
-export MAGENTA=$(tput setaf 5)
+if [ -n "${TERM:-}" ] && command -v tput >/dev/null 2>&1; then
+    export NORM
+    NORM=$(tput sgr0)
+    export BOLD
+    BOLD=$(tput bold)
+    export RED
+    RED=$(tput setaf 1)
+    export GREEN
+    GREEN=$(tput setaf 2)
+    export YELLOW
+    YELLOW=$(tput setaf 3)
+    export BLUE
+    BLUE=$(tput setaf 4)
+    export MAGENTA
+    MAGENTA=$(tput setaf 5)
+else
+    export NORM=""
+    export BOLD=""
+    export RED=""
+    export GREEN=""
+    export YELLOW=""
+    export BLUE=""
+    export MAGENTA=""
+fi
 
 export DEV_PROMPT="\[\033[${BOLD}${GREEN}\]\w\[\033[${NORM}\]\[\033[${NORM}${BOLD}${BLUE}\]\$(prompt.git_branch)\[\033[${NORM}\] $ "
 
@@ -65,4 +82,3 @@ display.is-highres && ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
 prompt.dev
 node.nvm.setup
 node.nodenv.setup
-
