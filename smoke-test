@@ -13,6 +13,40 @@ fi
 
 failures=0
 
+fail() {
+  local message="$1"
+  echo "FAIL: $message" >&2
+  failures=$((failures+1))
+}
+
+make_temp_home() {
+  mktemp -d /tmp/my-dotfiles-home.XXXXXX
+}
+
+setup_temp_profile_home() {
+  local tmp_home="$1"
+  local shell_name="$2"
+
+  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  if [ "$shell_name" = "bash" ]; then
+    cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  else
+    cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  fi
+}
+
+run_bash_profile() {
+  local tmp_home="$1"
+  shift
+  HOME="$tmp_home" bash "$@" 2>&1
+}
+
+run_zsh_profile() {
+  local tmp_home="$1"
+  shift
+  HOME="$tmp_home" zsh "$@" 2>&1
+}
+
 shopt -s nullglob
 for module_path in "$MODULES_DIR/"*; do
   for script_path in "$module_path/"*.sh; do
@@ -24,9 +58,8 @@ shopt -u nullglob
 
 require_func() {
   local fn="$1"
-  if ! declare -f "$fn" >/dev/null 2>&1; then
-    echo "FAIL: missing function: $fn" >&2
-    failures=$((failures+1))
+if ! declare -f "$fn" >/dev/null 2>&1; then
+    fail "missing function: $fn"
   else
     echo "OK: $fn"
   fi
@@ -54,19 +87,16 @@ require_func "vscode.setup-shell-command"
 
 echo "OK: util.trim output"
 if [ "$(util.trim "  hi  ")" != "hi" ]; then
-  echo "FAIL: util.trim produced unexpected output" >&2
-  failures=$((failures+1))
+  fail "util.trim produced unexpected output"
 fi
 
 echo "OK: prompt.git_branch can run"
 if ! out="$(prompt.git_branch 2>/dev/null)"; then
-  echo "FAIL: prompt.git_branch errored" >&2
-  failures=$((failures+1))
+  fail "prompt.git_branch errored"
 else
   # We only sanity-check that it returns something like " (branch)" or empty.
   if [ -n "$out" ] && [[ "$out" != " ("*")" ]]; then
-    echo "FAIL: prompt.git_branch output format unexpected: $out" >&2
-    failures=$((failures+1))
+    fail "prompt.git_branch output format unexpected: $out"
   fi
 fi
 
@@ -83,8 +113,7 @@ out="$(
 )"
 rm -rf "$tmp_git_dir"
 if [ "$out" != "(smoke-test-branch)" ]; then
-  echo "FAIL: git.parse_git_branch returned unexpected output: $out" >&2
-  failures=$((failures+1))
+  fail "git.parse_git_branch returned unexpected output: $out"
 fi
 
 echo "OK: flib.photos returns failure without exiting caller"
@@ -99,8 +128,7 @@ out="$(
   ' _ "$MODULES_DIR/flib/photos.sh" "$SCRIPT_DIR" 2>/dev/null
 )"
 if [ "$out" != $'status:1\nafter' ]; then
-  echo "FAIL: flib.photos should return 1 without exiting caller: $out" >&2
-  failures=$((failures+1))
+  fail "flib.photos should return 1 without exiting caller: $out"
 fi
 
 echo "OK: flib.group fails cleanly without a subject"
@@ -112,8 +140,7 @@ out="$(
   ' _ "$MODULES_DIR/flib/group.sh"
 )"
 if [ "$out" != "status:1" ]; then
-  echo "FAIL: flib.group should reject an empty subject: $out" >&2
-  failures=$((failures+1))
+  fail "flib.group should reject an empty subject: $out"
 fi
 
 echo "OK: node.extract_node_modules is quiet when there is nothing to move"
@@ -131,8 +158,7 @@ out="$(
 )"
 rm -rf "$empty_code_dir" "$empty_temp_dir"
 if [ "$out" != "status:0" ]; then
-  echo "FAIL: node.extract_node_modules should no-op cleanly: $out" >&2
-  failures=$((failures+1))
+  fail "node.extract_node_modules should no-op cleanly: $out"
 fi
 
 echo "OK: node.list_node_modules is quiet when there is nothing to list"
@@ -149,8 +175,7 @@ out="$(
 )"
 rm -rf "$empty_code_dir"
 if [ "$out" != "status:0" ]; then
-  echo "FAIL: node.list_node_modules should no-op cleanly: $out" >&2
-  failures=$((failures+1))
+  fail "node.list_node_modules should no-op cleanly: $out"
 fi
 
 echo "OK: git.push is wired through gcu"
@@ -162,8 +187,7 @@ out="$(
   ' _ "$MODULES_DIR/git/gcu.sh" "$MODULES_DIR/git/push.sh"
 )"
 if [[ "$out" != *'gcu "$@" && git push'* ]]; then
-  echo "FAIL: git.push is not calling gcu: $out" >&2
-  failures=$((failures+1))
+  fail "git.push is not calling gcu: $out"
 fi
 
 echo "OK: vscode.install-extensions no-ops when no extensions are configured"
@@ -179,8 +203,7 @@ out="$(
   ' _ "$MODULES_DIR/vscode/install-extensions.sh"
 )"
 if [ "$out" != "status:0" ]; then
-  echo "FAIL: vscode.install-extensions should no-op cleanly: $out" >&2
-  failures=$((failures+1))
+  fail "vscode.install-extensions should no-op cleanly: $out"
 fi
 
 echo "OK: install-shell-profile supports --profile all in plan mode"
@@ -188,8 +211,7 @@ out="$(
   bash --noprofile --norc "$SCRIPT_DIR/install-shell-profile" --list --profile all 2>&1
 )"
 if [[ "$out" == *"Error: profile directory not found"* ]]; then
-  echo "FAIL: install-shell-profile should expand --profile all: $out" >&2
-  failures=$((failures+1))
+  fail "install-shell-profile should expand --profile all: $out"
 fi
 
 echo "OK: pull-shell-profile supports --profile all in plan mode"
@@ -197,161 +219,124 @@ out="$(
   bash --noprofile --norc "$SCRIPT_DIR/pull-shell-profile" --list --profile all 2>&1
 )"
 if [[ "$out" == *"Error: profile directory not found"* ]]; then
-  echo "FAIL: pull-shell-profile should expand --profile all: $out" >&2
-  failures=$((failures+1))
+  fail "pull-shell-profile should expand --profile all: $out"
 fi
 
 echo "OK: .bash_profile degrades cleanly when modules are unavailable"
-tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-out="$(
-  TERM='' HOME="$tmp_home" \
-    bash --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
-)"
+tmp_home="$(make_temp_home)"
+setup_temp_profile_home "$tmp_home" "bash"
+out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
 if [[ "$out" == *"command not found"* ]]; then
-  echo "FAIL: .bash_profile should not call missing helper functions: $out" >&2
-  failures=$((failures+1))
+  fail ".bash_profile should not call missing helper functions: $out"
 fi
 if [[ "$out" == *"Shell: bash"* ]]; then
-  echo "FAIL: .bash_profile should stay quiet in non-interactive shells: $out" >&2
-  failures=$((failures+1))
+  fail ".bash_profile should stay quiet in non-interactive shells: $out"
 fi
 
 echo "OK: configured BASH_MODULES loads repo modules"
-tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+tmp_home="$(make_temp_home)"
 ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-out="$(
-  HOME="$tmp_home" \
-    bash --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit' 2>&1
-)"
+out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit')"
 rm -rf "$tmp_home"
 if [[ "$out" != *"prompt_loaded"* ]] || [[ "$out" != *"nvm_loaded"* ]]; then
-  echo "FAIL: configured BASH_MODULES should load repo modules: $out" >&2
-  failures=$((failures+1))
+  fail "configured BASH_MODULES should load repo modules: $out"
 fi
 
 echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
-tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+tmp_home="$(make_temp_home)"
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
 cat > "$tmp_home/.bashrc" <<'EOF'
 #!/bin/bash
 unset DOTFILES_DIR
 EOF
-out="$(
-  TERM='' HOME="$tmp_home" \
-    bash --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
-)"
+out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
 if [[ "$out" == *"DOTFILES_DIR is not set"* ]]; then
-  echo "FAIL: .bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset: $out" >&2
-  failures=$((failures+1))
+  fail ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset: $out"
 fi
 
 echo "OK: interactive .bash_profile warns when DOTFILES_DIR is invalid"
-tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+tmp_home="$(make_temp_home)"
 cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
 cat > "$tmp_home/.bashrc" <<'EOF'
 #!/bin/bash
 export DOTFILES_DIR="/no/such/dotfiles"
 EOF
-out="$(
-  HOME="$tmp_home" bash --rcfile "$tmp_home/.bash_profile" -i -c exit 2>&1
-)"
+out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c exit)"
 rm -rf "$tmp_home"
 if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
-  echo "FAIL: interactive .bash_profile should warn on invalid DOTFILES_DIR: $out" >&2
-  failures=$((failures+1))
+  fail "interactive .bash_profile should warn on invalid DOTFILES_DIR: $out"
 fi
 
 echo "OK: .bash_profile is idempotent when sourced twice"
-tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-out="$(
-  HOME="$tmp_home" bash --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit' 2>&1
-)"
+tmp_home="$(make_temp_home)"
+setup_temp_profile_home "$tmp_home" "bash"
+# shellcheck disable=SC2016
+out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit')"
 rm -rf "$tmp_home"
 if [ "$(printf '%s\n' "$out" | grep -c '^Shell: bash$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
-  echo "FAIL: .bash_profile should only initialize once: $out" >&2
-  failures=$((failures+1))
+  fail ".bash_profile should only initialize once: $out"
 fi
 
-echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
-if command -v zsh >/dev/null 2>&1; then
-  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-  out="$(
-    HOME="$tmp_home" zsh -f -c 'source "$HOME/.zshrc"' 2>&1
-  )"
+  echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
+  if command -v zsh >/dev/null 2>&1; then
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"')"
   rm -rf "$tmp_home"
   if [[ "$out" == *"command not found"* ]]; then
-    echo "FAIL: .zshrc should not require missing helper functions: $out" >&2
-    failures=$((failures+1))
+    fail ".zshrc should not require missing helper functions: $out"
   fi
   if [[ "$out" == *"Shell: zsh"* ]]; then
-    echo "FAIL: .zshrc should stay quiet in non-interactive shells: $out" >&2
-    failures=$((failures+1))
+    fail ".zshrc should stay quiet in non-interactive shells: $out"
   fi
 
   echo "OK: .zshrc loads shared shell modules"
-  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-  out="$(
-    HOME="$tmp_home" zsh -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?' 2>&1
-  )"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zshrc"; alias gs >/dev/null 2>&1; echo gs:$?; alias gr >/dev/null 2>&1; echo gr:$?; whence prompt.dev >/dev/null 2>&1; echo prompt_dev:$?; whence git.parse_git_branch >/dev/null 2>&1; echo git_parse:$?')"
   rm -rf "$tmp_home"
   if [[ "$out" != *"gs:0"* ]] || [[ "$out" != *"gr:0"* ]] || [[ "$out" != *"prompt_dev:0"* ]] || [[ "$out" != *"git_parse:0"* ]]; then
-    echo "FAIL: .zshrc should load shared shell modules: $out" >&2
-    failures=$((failures+1))
+    fail ".zshrc should load shared shell modules: $out"
   fi
 
   echo "OK: interactive .zshrc applies prompt.dev"
-  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-  out="$(
-    HOME="$tmp_home" zsh -i -c 'print -r -- "$PS1"' 2>&1
-  )"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -i -c 'print -r -- "$PS1"')"
   rm -rf "$tmp_home"
   # shellcheck disable=SC2016
   if [[ "$out" != *'$(prompt.git_branch) $ '* ]]; then
-    echo "FAIL: interactive .zshrc should apply prompt.dev: $out" >&2
-    failures=$((failures+1))
+    fail "interactive .zshrc should apply prompt.dev: $out"
   fi
 
   echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
-  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+  tmp_home="$(make_temp_home)"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
   cat > "$tmp_home/.bashrc" <<'EOF'
 #!/bin/bash
 export DOTFILES_DIR="/no/such/dotfiles"
 export BASH_MODULES="$DOTFILES_DIR/src/bash/modules"
 EOF
-  out="$(
-    HOME="$tmp_home" zsh -i -c exit 2>&1
-  )"
+  out="$(run_zsh_profile "$tmp_home" -i -c exit)"
   rm -rf "$tmp_home"
   if [[ "$out" != *"Error: DOTFILES_DIR does not exist: /no/such/dotfiles"* ]]; then
-    echo "FAIL: interactive .zshrc should warn on invalid DOTFILES_DIR: $out" >&2
-    failures=$((failures+1))
+    fail "interactive .zshrc should warn on invalid DOTFILES_DIR: $out"
   fi
 
   echo "OK: .zshrc is idempotent when sourced twice"
-  tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-  out="$(
-    HOME="$tmp_home" zsh -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"' 2>&1
-  )"
+  tmp_home="$(make_temp_home)"
+  setup_temp_profile_home "$tmp_home" "zsh"
+  # shellcheck disable=SC2016
+  out="$(run_zsh_profile "$tmp_home" -i -c 'source "$HOME/.zshrc"; source "$HOME/.zshrc"; print -r -- "loaded:$DOTFILES_ZSHRC_LOADED"')"
   rm -rf "$tmp_home"
   if [ "$(printf '%s\n' "$out" | grep -c '^Shell: zsh$')" -ne 1 ] || [[ "$out" != *"loaded:1"* ]]; then
-    echo "FAIL: .zshrc should only initialize once: $out" >&2
-    failures=$((failures+1))
+    fail ".zshrc should only initialize once: $out"
   fi
 else
   echo "SKIP: zsh is not installed"
