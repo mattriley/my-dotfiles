@@ -30,8 +30,8 @@ fi
 if [ "$DRY_RUN" -eq 0 ]; then
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
 fi
-[ "$DRY_RUN" -eq 1 ] || git.set_author || overall_status=1
-[ "$DRY_RUN" -eq 1 ] || macos.set_screencapture_location || overall_status=1
+[ "$DRY_RUN" -eq 1 ] || git.set_author "${MY_AUTHOR_NAME:-}" "${MY_AUTHOR_EMAIL:-}" || overall_status=1
+[ "$DRY_RUN" -eq 1 ] || macos.set_screencapture_location "${SCREENCAPTURE_DIR:-}" || overall_status=1
 
 if [ "$overall_status" -ne 0 ]; then
     echo "refresh: finished with errors (profile=$PROFILE, dry-run=$DRY_RUN)." >&2
