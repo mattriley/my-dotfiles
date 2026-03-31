@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Lint shell scripts
+        run: shellcheck refresh install-shell-profile pull-shell-profile smoke-test src/bash/modules/**/*.sh src/bash/profiles/default/.bashrc
+
+      - name: Run smoke test
+        run: bash --noprofile --norc ./smoke-test
