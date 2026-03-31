@@ -39,6 +39,11 @@ require_func "prompt.dev"
 require_func "display.is-highres"
 require_func "node.nvm.setup"
 require_func "node.nodenv.setup"
+require_func "node.extract_node_modules"
+require_func "node.restore_node_modules"
+require_func "flib.photos"
+require_func "gcu"
+require_func "git.push"
 
 echo "OK: util.trim output"
 if [ "$(util.trim "  hi  ")" != "hi" ]; then
@@ -58,10 +63,57 @@ else
   fi
 fi
 
+echo "OK: flib.photos returns failure without exiting caller"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    PHOTOS_PARTIAL_PATH=/no/such/path/
+    CODE_DIR="$2"
+    flib.photos missing >/dev/null 2>&1
+    printf "status:%s\n" "$?"
+    echo after
+  ' _ "$MODULES_DIR/flib/photos.sh" "$SCRIPT_DIR" 2>/dev/null
+)"
+if [ "$out" != $'status:1\nafter' ]; then
+  echo "FAIL: flib.photos should return 1 without exiting caller: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: node.extract_node_modules is quiet when there is nothing to move"
+empty_code_dir="$(mktemp -d /tmp/my-dotfiles-smoke-code.XXXXXX)"
+empty_temp_dir="$(mktemp -d /tmp/my-dotfiles-smoke-temp.XXXXXX)"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    output="$(node.extract_node_modules "$2" "$3" 2>&1)"
+    if [ -n "$output" ]; then
+      printf "%s\n" "$output"
+    fi
+    printf "status:%s" "$?"
+  ' _ "$MODULES_DIR/node/extract-node-modules.sh" "$empty_code_dir" "$empty_temp_dir"
+)"
+rm -rf "$empty_code_dir" "$empty_temp_dir"
+if [ "$out" != "status:0" ]; then
+  echo "FAIL: node.extract_node_modules should no-op cleanly: $out" >&2
+  failures=$((failures+1))
+fi
+
+echo "OK: git.push is wired through gcu"
+out="$(
+  bash --noprofile --norc -c '
+    source "$1"
+    source "$2"
+    declare -f git.push
+  ' _ "$MODULES_DIR/git/gcu.sh" "$MODULES_DIR/git/push.sh"
+)"
+if [[ "$out" != *'gcu "$@" && git push'* ]]; then
+  echo "FAIL: git.push is not calling gcu: $out" >&2
+  failures=$((failures+1))
+fi
+
 if [ "$failures" -gt 0 ]; then
   echo "Smoke test finished with $failures failure(s)." >&2
   exit 1
 fi
 
 echo "Smoke test: PASS"
-
