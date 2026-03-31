@@ -219,6 +219,20 @@ if [[ "$out" == *"Shell: bash"* ]]; then
   failures=$((failures+1))
 fi
 
+echo "OK: configured BASH_MODULES loads repo modules"
+tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"
+ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+out="$(
+  HOME="$tmp_home" \
+    bash --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit' 2>&1
+)"
+rm -rf "$tmp_home"
+if [[ "$out" != *"prompt_loaded"* ]] || [[ "$out" != *"nvm_loaded"* ]]; then
+  echo "FAIL: configured BASH_MODULES should load repo modules: $out" >&2
+  failures=$((failures+1))
+fi
+
 echo "OK: .zshrc degrades cleanly when optional tooling is unavailable"
 if command -v zsh >/dev/null 2>&1; then
   tmp_home="$(mktemp -d /tmp/my-dotfiles-home.XXXXXX)"

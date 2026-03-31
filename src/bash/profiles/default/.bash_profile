@@ -28,8 +28,8 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 
 export HOME_DIR="$HOME/Home"
 export TEMP_DIR="$HOME_DIR/.temp"
-export CODE_DIR="$HOME_DIR/Code"
-export BASH_MODULES="$CODE_DIR/my-dotfiles/src/bash/modules"
+export CODE_DIR="${CODE_DIR:-$HOME/Home/Code}"
+export BASH_MODULES="${BASH_MODULES:-$DOTFILES_DIR/src/bash/modules}"
 export ITERMOCIL_LAYOUT_DEFAULT="main-vertical"
 export ITERMOCIL_LAYOUT_HIGHRES="even-vertical"
 export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_DEFAULT"
