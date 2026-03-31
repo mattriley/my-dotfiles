@@ -13,6 +13,11 @@ esac
 
 [ "$is_interactive" -eq 1 ] && echo "Shell: zsh"
 
+# Load shared git aliases when the repo path is configured.
+if [ -n "${DOTFILES_DIR:-}" ] && [ -f "$DOTFILES_DIR/src/bash/modules/git/aliases.sh" ]; then
+    source "$DOTFILES_DIR/src/bash/modules/git/aliases.sh"
+fi
+
 # Initialize nvm (if installed) so `node`/`npm` match your desired version in zsh.
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
