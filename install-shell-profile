@@ -6,12 +6,18 @@ BOLD=$(tput bold)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DRY_RUN=0
+LIST_ONLY=0
 PROFILE="default"
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --dry-run)
             DRY_RUN=1
+            shift
+            ;;
+        --list|--plan)
+            DRY_RUN=1
+            LIST_ONLY=1
             shift
             ;;
         --profile=*)
@@ -23,7 +29,7 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         -h|--help)
-            echo "Usage: $0 [--dry-run] [--profile <name>]"
+            echo "Usage: $0 [--dry-run|--list|--plan] [--profile <name>]"
             exit 0
             ;;
         *)
@@ -47,21 +53,33 @@ function install_shell_profile {
     echo
 
     local failures=0
-    find "$target" -type f -print0 | 
-        while IFS= read -r -d '' path; do 
+    local processed=0
+    while IFS= read -r -d '' path; do 
             local dest="$HOME${path#"$target"}"
             local base; base="$(basename "$path")"
             # Skip editor/system cruft so it doesn't get installed into $HOME
             [ "$base" = ".DS_Store" ] && continue
 
+            processed=$((processed+1))
+
             if [ "$DRY_RUN" -eq 1 ]; then
-                echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
+                if [ "$LIST_ONLY" -eq 1 ]; then
+                    echo "LIST: ln -sfv \"$path\" \"$dest\""
+                else
+                    echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
+                fi
                 continue
             fi
 
             mkdir -p "$(dirname "$dest")" || { failures=$((failures+1)); continue; }
             ln -sfv "$path" "$dest" || failures=$((failures+1))
-        done
+        done < <(find "$target" -type f -print0)
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        echo
+        echo "Plan complete: would process $processed file(s)."
+        return 0
+    fi
 
     if [ "$failures" -gt 0 ]; then
         echo "Completed with $failures error(s)." >&2
