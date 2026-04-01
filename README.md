@@ -39,6 +39,24 @@ Files that should be installed as regular copies rather than symlinks live under
 
 `refresh` also applies the managed iTerm2 default bookmark GUID so new iTerm2 windows open with the intended dynamic profile.
 
+### Workflow
+Treat the profile tree as the source of truth:
+- `profiles/<profile>/link/` contains symlink-managed files
+- `profiles/<profile>/copy/` contains copy-managed files
+- `profiles/<profile>/env.sh` contains profile-scoped environment and machine defaults
+- `profiles/<profile>/Brewfile` contains the Homebrew bundle state for that profile
+
+Typical flow:
+- edit repo-managed files directly, then run `./apply_profile` or `./refresh`
+- use `./capture_profile` when you intentionally changed live machine state first and want to bring it back into the repo
+
+Command roles:
+- `apply_profile` applies repo-managed profile state to the machine
+- `capture_profile` captures current machine state back into the repo
+- `refresh` orchestrates the broader update flow, including profile application and profile-level automation such as Brewfile refresh
+
+Be careful with `capture_profile`: it promotes current machine state into source of truth.
+
 ## Configuration
 The managed profiles currently set:
 - `DOTFILES_DIR=/Users/mattriley/Home/Code/my-dotfiles`
