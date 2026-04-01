@@ -65,11 +65,13 @@ function pull_copy_profile_file {
 
 function pull_profiles {
     local profiles_dir="$SCRIPT_DIR/profiles"
+    # shellcheck disable=SC2153
+    local requested_profile="$PROFILE"
     local status=0
     local processed=0
     local profile_dir
 
-    dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
+    dotfiles.collect_profiles "$profiles_dir" "$requested_profile" || return 1
 
     for profile_dir in "${DOTFILES_PROFILES[@]}"; do
         echo "Pulling $BOLD$profile_dir$NORM profile..."
