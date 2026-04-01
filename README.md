@@ -17,6 +17,12 @@ To switch iTerm back to bash:
 ### Dependency bootstrap
 Run `./install_dependencies` to install the small set of external tools this repo expects for validation and maintenance. The script is rerunnable and skips packages that are already installed.
 
+### Homebrew sync
+Use [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) to track Homebrew formulas, casks, VS Code extensions, and npm packages managed through Homebrew Bundle.
+
+- `refresh` updates [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) on non-dry runs through `brew.bundle_dump`.
+- `brew.bundle_install` is available as a bash module function for applying [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) from an interactive shell when needed.
+
 ### Validation
 Run `./smoke_test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
 

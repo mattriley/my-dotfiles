@@ -5,6 +5,8 @@ cd "$SCRIPT_DIR" || exit 1
 
 source "$SCRIPT_DIR/src/bash/script_common.sh"
 # shellcheck disable=SC1091
+source "$SCRIPT_DIR/src/bash/modules/brew/bundle_dump.sh"
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/modules/git/set_author.sh"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/modules/macos/set_screencapture_location.sh"
@@ -29,6 +31,7 @@ fi
 [ -f "$DOTFILES_DIR/dotfiles_personal.sh" ] && source "$DOTFILES_DIR/dotfiles_personal.sh"
 
 if [ "$DRY_RUN" -eq 0 ]; then
+    brew.bundle_dump "$SCRIPT_DIR" || overall_status=1
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
 fi
 [ "$DRY_RUN" -eq 1 ] || git.set_author.default || overall_status=1

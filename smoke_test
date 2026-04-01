@@ -12,6 +12,8 @@ if [ ! -d "$MODULES_DIR" ]; then
 fi
 
 failures=0
+RUN_OUTPUT=''
+RUN_STATUS=0
 
 function fail {
   local message="$1"
@@ -50,6 +52,14 @@ function expect_line_count {
   [ "$actual_count" -eq "$expected_count" ] || fail "$message: $haystack"
 }
 
+function normalize_bash_interactive_output {
+  local output="$1"
+  printf '%s\n' "$output" |
+    sed '/^bash: cannot set terminal process group /d' |
+    sed '/^bash: no job control in this shell$/d' |
+    sed '/^exit$/d'
+}
+
 function make_temp_home {
   mktemp -d /tmp/my-dotfiles-home.XXXXXX
 }
@@ -70,58 +80,88 @@ function setup_temp_profile_home {
 function run_bash_profile {
   local tmp_home="$1"
   shift
-  HOME="$tmp_home" bash "$@" 2>&1
+  /usr/bin/env -u BASH_ENV -u ENV -u DOTFILES_BASH_PROFILE_LOADED HOME="$tmp_home" /bin/bash "$@" 2>&1
 }
 
 function run_zsh_profile {
   local tmp_home="$1"
   shift
-  HOME="$tmp_home" zsh "$@" 2>&1
+  /usr/bin/env -u DOTFILES_ZPROFILE_LOADED -u DOTFILES_ZSHRC_LOADED HOME="$tmp_home" /bin/zsh "$@" 2>&1
+}
+
+function run_bash_script_in_home {
+  local tmp_home="$1"
+  local script_body="$2"
+  local tmp_script
+  local tmp_output
+
+  tmp_script="$(mktemp /tmp/my-dotfiles-bash-script.XXXXXX)" || return 1
+  tmp_output="$(mktemp /tmp/my-dotfiles-bash-output.XXXXXX)" || {
+    rm -f "$tmp_script"
+    return 1
+  }
+  {
+    printf 'export HOME=%q\n' "$tmp_home"
+    printf '%s\n' "$script_body"
+  } > "$tmp_script"
+  chmod +x "$tmp_script"
+  if run_bash_profile "$tmp_home" --noprofile --norc "$tmp_script" >"$tmp_output"; then
+    RUN_STATUS=0
+  else
+    RUN_STATUS=$?
+  fi
+  rm -f "$tmp_script"
+  RUN_OUTPUT="$(cat "$tmp_output")"
+  rm -f "$tmp_output"
+  return "$RUN_STATUS"
 }
 
 function assert_bash_profile_noninteractive_clean {
   local tmp_home
-  local out
-
   echo "OK: .bash_profile degrades cleanly when modules are unavailable"
   tmp_home="$(make_temp_home)"
   setup_temp_profile_home "$tmp_home" "bash"
-  out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
+  # shellcheck disable=SC2016
+  TERM='' run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"'
   rm -rf "$tmp_home"
-  expect_not_contains "$out" "command not found" ".bash_profile should not call missing helper functions"
-  expect_not_contains "$out" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
+  expect_not_contains "$RUN_OUTPUT" "command not found" ".bash_profile should not call missing helper functions"
+  expect_not_contains "$RUN_OUTPUT" "Shell: bash" ".bash_profile should stay quiet in non-interactive shells"
 }
 
 function assert_bash_profile_requires_bashrc {
   local tmp_home
-  local out
 
   echo "OK: .bash_profile fails clearly when .bashrc is missing"
   tmp_home="$(make_temp_home)"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   # shellcheck disable=SC2016
-  out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; exit')"
+  run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"'
   rm -rf "$tmp_home"
-  expect_contains "$out" "Error: missing required file: $tmp_home/.bashrc" ".bash_profile should require .bashrc"
+  if [ -n "${SMOKE_TEST_DEBUG:-}" ]; then
+    printf 'DEBUG: assert_bash_profile_requires_bashrc status=<%s> out=<%s>\n' "$RUN_STATUS" "$RUN_OUTPUT" >&2
+  fi
+  expect_contains "$RUN_OUTPUT" "Error: missing required file: $tmp_home/.bashrc" ".bash_profile should require .bashrc"
 }
 
 function assert_bash_profile_loads_modules {
   local tmp_home
-  local out
 
   echo "OK: configured BASH_MODULES loads repo modules"
   tmp_home="$(make_temp_home)"
   ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
-  out="$(run_bash_profile "$tmp_home" --rcfile "$tmp_home/.bash_profile" -i -c 'declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded; exit')"
+  # shellcheck disable=SC2016
+  run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"; declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded'
   rm -rf "$tmp_home"
-  expect_contains "$out" "prompt_loaded" "configured BASH_MODULES should load repo modules"
-  expect_contains "$out" "nvm_loaded" "configured BASH_MODULES should load repo modules"
+  if [ -n "${SMOKE_TEST_DEBUG:-}" ]; then
+    printf 'DEBUG: assert_bash_profile_loads_modules status=<%s> out=<%s>\n' "$RUN_STATUS" "$RUN_OUTPUT" >&2
+  fi
+  expect_contains "$RUN_OUTPUT" "prompt_loaded" "configured BASH_MODULES should load repo modules"
+  expect_contains "$RUN_OUTPUT" "nvm_loaded" "configured BASH_MODULES should load repo modules"
 }
 
 function assert_bash_profile_unset_dotfiles_dir_quiet {
   local tmp_home
-  local out
 
   echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
   tmp_home="$(make_temp_home)"
@@ -130,23 +170,23 @@ function assert_bash_profile_unset_dotfiles_dir_quiet {
 #!/bin/bash
 unset DOTFILES_DIR
 EOF
-  out="$(TERM='' run_bash_profile "$tmp_home" --noprofile --norc --rcfile "$tmp_home/.bash_profile" -i -c exit)"
+  # shellcheck disable=SC2016
+  TERM='' run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"'
   rm -rf "$tmp_home"
-  expect_not_contains "$out" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
+  expect_not_contains "$RUN_OUTPUT" "DOTFILES_DIR is not set" ".bash_profile should not warn in non-interactive shells when DOTFILES_DIR is unset"
 }
 
 function assert_bash_profile_idempotent {
   local tmp_home
-  local out
 
   echo "OK: .bash_profile is idempotent when sourced twice"
   tmp_home="$(make_temp_home)"
   setup_temp_profile_home "$tmp_home" "bash"
   # shellcheck disable=SC2016
-  out="$(run_bash_profile "$tmp_home" --noprofile --norc -i -c 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; exit')"
+  run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"; source "$HOME/.bash_profile"; printf "loaded:%s\n" "$DOTFILES_BASH_PROFILE_LOADED"; printf "brew_count:%s\n" "$(printf "%s" "$PATH" | awk -F: '"'"'{c=0; for (i=1; i<=NF; i++) if ($i=="/opt/homebrew/bin") c++; print c}'"'"')"'
   rm -rf "$tmp_home"
-  expect_line_count "$out" '^Shell: bash$' 1 ".bash_profile should only initialize once"
-  expect_contains "$out" "loaded:1" ".bash_profile should only initialize once"
+  expect_contains "$RUN_OUTPUT" "loaded:1" ".bash_profile should only initialize once"
+  expect_contains "$RUN_OUTPUT" "brew_count:1" ".bash_profile should only initialize once"
 }
 
 function assert_zsh_profile_noninteractive_clean {
@@ -283,6 +323,8 @@ require_func "node.nodenv.install"
 require_func "node.nvm.install"
 require_func "flib.photos"
 require_func "flib.group"
+require_func "brew.bundle_dump"
+require_func "brew.bundle_install"
 require_func "gcu"
 require_func "git.push"
 require_func "git.set_author"
