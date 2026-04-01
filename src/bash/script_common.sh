@@ -86,7 +86,7 @@ function dotfiles.sync_profile_files {
     local profile="$2"
     local action_label="$3"
     local handler="$4"
-    local target="$script_dir/src/bash/profiles/$profile"
+    local target="$script_dir/profiles/$profile"
     local failures=0
     local processed=0
     local path

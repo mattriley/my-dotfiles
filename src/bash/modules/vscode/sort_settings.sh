@@ -6,7 +6,7 @@ function vscode.sort_settings {
     local profile="${2:-default}"
     command -v jq >/dev/null 2>&1 || return 0
 
-    local profiles_dir="$script_dir/src/bash/profiles"
+    local profiles_dir="$script_dir/profiles"
     [ -d "$profiles_dir" ] || return 0
 
     dotfiles.collect_profiles "$profiles_dir" "$profile" || return 1

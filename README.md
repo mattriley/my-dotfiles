@@ -29,9 +29,9 @@ Run `./smoke_test` to verify that the shell modules load and that key failure pa
 ### Profile planning
 Use `./install_shell_profile --list` or `./install_shell_profile --plan` to see which files would be symlinked into `$HOME`.
 
-Use `./pull_shell_profile --list` or `./pull_shell_profile --plan` to see which files would be copied back into `src/`.
+Use `./pull_shell_profile --list` or `./pull_shell_profile --plan` to see which files would be copied back into the repo-managed `profiles/` tree.
 
-Use `--profile all` with `install_shell_profile`, `pull_shell_profile`, or `refresh` to operate on every profile directory under `src/bash/profiles/`.
+Use `--profile all` with `install_shell_profile`, `pull_shell_profile`, or `refresh` to operate on every profile directory under `profiles/`.
 
 ## Configuration
 The managed profiles currently set:
@@ -41,7 +41,7 @@ The managed profiles currently set:
 - `.zprofile` requires `.zshrc`; zsh initialization lives in `.zshrc`, while `.zprofile` is only the login-shell wrapper
 - personal machine/user defaults live in [dotfiles_personal.sh](/Users/mattriley/Home/Code/my-dotfiles/dotfiles_personal.sh)
 
-If the repository path changes, update [src/bash/profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/src/bash/profiles/default/.bashrc) so both bash and zsh load shared modules from the correct location.
+If the repository path changes, update [profiles/default/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/.bashrc) so both bash and zsh load shared modules from the correct location.
 
 ## Quality Checks
 GitHub Actions runs:

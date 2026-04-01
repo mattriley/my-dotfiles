@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/script_common.sh"
 
 dotfiles.setup_styles
@@ -17,6 +18,7 @@ function install_profile_file {
     # Skip editor/system cruft so it doesn't get installed into $HOME
     [ "$base" = ".DS_Store" ] && return 0
 
+    # shellcheck disable=SC2034
     DOTFILES_ITERATE_COUNTED=1
 
     if [ "$DRY_RUN" -eq 1 ]; then
@@ -33,7 +35,7 @@ function install_profile_file {
 }
 
 function install_profiles {
-    local profiles_dir="$SCRIPT_DIR/src/bash/profiles"
+    local profiles_dir="$SCRIPT_DIR/profiles"
     local status=0
     local profile_dir
 

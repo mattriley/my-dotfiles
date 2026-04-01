@@ -27,12 +27,12 @@ jobs:
         run: brew install shellcheck
 
       - name: Lint shell scripts
-        run: shellcheck refresh install_shell_profile pull_shell_profile smoke_test src/bash/modules/**/*.sh src/bash/profiles/default/.bash_profile src/bash/profiles/default/.bashrc
+        run: shellcheck refresh install_shell_profile pull_shell_profile smoke_test src/bash/modules/**/*.sh profiles/default/.bash_profile profiles/default/.bashrc
 
       - name: Validate shell syntax
         run: |
-          bash -n refresh install_shell_profile pull_shell_profile smoke_test src/bash/modules/**/*.sh src/bash/profiles/default/.bash_profile src/bash/profiles/default/.bashrc
-          zsh -n src/bash/profiles/default/.zshrc
+          bash -n refresh install_shell_profile pull_shell_profile smoke_test src/bash/modules/**/*.sh profiles/default/.bash_profile profiles/default/.bashrc
+          zsh -n profiles/default/.zshrc
 
       - name: Run smoke test
         run: bash --noprofile --norc ./smoke_test

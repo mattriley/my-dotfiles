@@ -68,12 +68,12 @@ function setup_temp_profile_home {
   local tmp_home="$1"
   local shell_name="$2"
 
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  cp "$SCRIPT_DIR/profiles/default/.bashrc" "$tmp_home/.bashrc"
   if [ "$shell_name" = "bash" ]; then
-    cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+    cp "$SCRIPT_DIR/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   else
-    cp "$SCRIPT_DIR/src/bash/profiles/default/.zprofile" "$tmp_home/.zprofile"
-    cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+    cp "$SCRIPT_DIR/profiles/default/.zprofile" "$tmp_home/.zprofile"
+    cp "$SCRIPT_DIR/profiles/default/.zshrc" "$tmp_home/.zshrc"
   fi
 }
 
@@ -133,7 +133,7 @@ function assert_bash_profile_requires_bashrc {
 
   echo "OK: .bash_profile fails clearly when .bashrc is missing"
   tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cp "$SCRIPT_DIR/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   # shellcheck disable=SC2016
   run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"'
   rm -rf "$tmp_home"
@@ -148,8 +148,8 @@ function assert_bash_profile_loads_modules {
 
   echo "OK: configured BASH_MODULES loads repo modules"
   tmp_home="$(make_temp_home)"
-  ln -s "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bashrc" "$tmp_home/.bashrc"
+  ln -s "$SCRIPT_DIR/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cp "$SCRIPT_DIR/profiles/default/.bashrc" "$tmp_home/.bashrc"
   # shellcheck disable=SC2016
   run_bash_script_in_home "$tmp_home" 'source "$HOME/.bash_profile"; declare -f prompt.dev >/dev/null && echo prompt_loaded; declare -f node.nvm.setup >/dev/null && echo nvm_loaded'
   rm -rf "$tmp_home"
@@ -165,7 +165,7 @@ function assert_bash_profile_unset_dotfiles_dir_quiet {
 
   echo "OK: .bash_profile stays quiet when DOTFILES_DIR is unset in non-interactive shells"
   tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
+  cp "$SCRIPT_DIR/profiles/default/.bash_profile" "$tmp_home/.bash_profile"
   cat > "$tmp_home/.bashrc" <<'EOF'
 #!/bin/bash
 unset DOTFILES_DIR
@@ -209,7 +209,7 @@ function assert_zprofile_requires_zshrc {
 
   echo "OK: .zprofile fails clearly when .zshrc is missing"
   tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zprofile" "$tmp_home/.zprofile"
+  cp "$SCRIPT_DIR/profiles/default/.zprofile" "$tmp_home/.zprofile"
   # shellcheck disable=SC2016
   out="$(run_zsh_profile "$tmp_home" -f -c 'source "$HOME/.zprofile"')"
   rm -rf "$tmp_home"
@@ -267,7 +267,7 @@ function assert_zsh_profile_invalid_dotfiles_dir_warns {
 
   echo "OK: interactive .zshrc warns when DOTFILES_DIR is invalid"
   tmp_home="$(make_temp_home)"
-  cp "$SCRIPT_DIR/src/bash/profiles/default/.zshrc" "$tmp_home/.zshrc"
+  cp "$SCRIPT_DIR/profiles/default/.zshrc" "$tmp_home/.zshrc"
   cat > "$tmp_home/.bashrc" <<'EOF'
 #!/bin/bash
 export DOTFILES_DIR="/no/such/dotfiles"
