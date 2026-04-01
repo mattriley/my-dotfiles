@@ -329,6 +329,8 @@ require_func "gcu"
 require_func "git.push"
 require_func "git.set_author"
 require_func "git.set_author.default"
+require_func "iterm2.set_default_bookmark"
+require_func "iterm2.set_default_bookmark.default"
 require_func "macos.set_screencapture_location"
 require_func "macos.set_screencapture_location.default"
 require_func "vscode.install_extensions"
@@ -458,13 +460,37 @@ echo "OK: install_shell_profile supports --profile all in plan mode"
 out="$(
   bash --noprofile --norc "$SCRIPT_DIR/install_shell_profile" --list --profile all 2>&1
 )"
-  expect_not_contains "$out" "Error: profile home directory not found" "install_shell_profile should expand --profile all"
+expect_not_contains "$out" "Error: profile home directory not found" "install_shell_profile should expand --profile all"
+expect_not_contains "$out" "Error: profile copy directory not found" "install_shell_profile should expand --profile all"
+expect_contains "$out" 'LIST COPY: cp -f "/Users/mattriley/Home/Code/my-dotfiles/profiles/default/copy/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" "/Users/mattriley/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json"' "install_shell_profile should copy copy-managed files"
 
 echo "OK: pull_shell_profile supports --profile all in plan mode"
 out="$(
   bash --noprofile --norc "$SCRIPT_DIR/pull_shell_profile" --list --profile all 2>&1
 )"
-  expect_not_contains "$out" "Error: profile home directory not found" "pull_shell_profile should expand --profile all"
+expect_not_contains "$out" "Error: profile home directory not found" "pull_shell_profile should expand --profile all"
+  expect_not_contains "$out" "Error: profile copy directory not found" "pull_shell_profile should expand --profile all"
+
+echo "OK: install_shell_profile copies copy-managed files"
+tmp_home="$(make_temp_home)"
+out="$(
+  HOME="$tmp_home" bash --noprofile --norc "$SCRIPT_DIR/install_shell_profile" --profile default 2>&1
+)"
+[ -L "$tmp_home/.bashrc" ] || fail "install_shell_profile should symlink home-managed files"
+[ -f "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" ] || fail "install_shell_profile should create copy-managed files"
+[ ! -L "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" ] || fail "install_shell_profile should copy, not symlink, copy-managed files"
+rm -rf "$tmp_home"
+
+echo "OK: install_shell_profile replaces broken symlinks for copy-managed files"
+tmp_home="$(make_temp_home)"
+mkdir -p "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles"
+ln -s "$SCRIPT_DIR/profiles/default/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json"
+out="$(
+  HOME="$tmp_home" bash --noprofile --norc "$SCRIPT_DIR/install_shell_profile" --profile default 2>&1
+)"
+[ -f "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" ] || fail "install_shell_profile should replace broken symlinks for copy-managed files"
+[ ! -L "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" ] || fail "install_shell_profile should replace broken symlinks with copied files"
+rm -rf "$tmp_home"
 
 assert_bash_profile_noninteractive_clean
 assert_bash_profile_requires_bashrc

@@ -26,25 +26,67 @@ function pull_profile_file {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         if [ "$LIST_ONLY" -eq 1 ]; then
-            echo "LIST: cp -f \"$dest\" \"$path\""
+            echo "LIST PULL: cp -f \"$dest\" \"$path\""
         else
-            echo "DRY RUN: cp -f \"$dest\" \"$path\""
+            echo "DRY RUN PULL: cp -f \"$dest\" \"$path\""
         fi
         return 0
     fi
 
-    cp -f "$dest" "$path"
+    echo "PULL: $path"
+    cp -fv "$dest" "$path"
+}
+
+function pull_copy_profile_file {
+    local path="$1"
+    local dest="$2"
+    local base="$3"
+
+    [ "$base" = ".DS_Store" ] && return 0
+    [ -e "$dest" ] || return 0
+
+    # shellcheck disable=SC2034
+    DOTFILES_ITERATE_COUNTED=1
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "$LIST_ONLY" -eq 1 ]; then
+            echo "LIST PULL COPY: cp -f \"$dest\" \"$path\""
+        else
+            echo "DRY RUN PULL COPY: cp -f \"$dest\" \"$path\""
+        fi
+        return 0
+    fi
+
+    echo "PULL COPY: $path"
+    cp -fv "$dest" "$path"
 }
 
 function pull_profiles {
     local profiles_dir="$SCRIPT_DIR/profiles"
     local status=0
+    local processed=0
     local profile_dir
 
     dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
 
     for profile_dir in "${DOTFILES_PROFILES[@]}"; do
-        dotfiles.sync_profile_files "$SCRIPT_DIR" "$profile_dir" "Pulling" pull_profile_file || status=1
+        echo "Pulling $BOLD$profile_dir$NORM profile..."
+        echo
+
+        dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "home" pull_profile_file || status=1
+        processed=$((processed + ${DOTFILES_LAST_PROCESSED:-0}))
+
+        if dotfiles.optional_profile_tree_exists "$SCRIPT_DIR" "$profile_dir" "copy"; then
+            dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "copy" pull_copy_profile_file || status=1
+            processed=$((processed + ${DOTFILES_LAST_PROCESSED:-0}))
+        fi
+
+        if [ "$DRY_RUN" -eq 1 ]; then
+            echo
+            echo "Plan complete: would process $processed file(s)."
+        else
+            echo
+        fi
     done
 
     return "$status"

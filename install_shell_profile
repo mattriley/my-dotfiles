@@ -23,26 +23,69 @@ function install_profile_file {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         if [ "$LIST_ONLY" -eq 1 ]; then
-            echo "LIST: ln -sfv \"$path\" \"$dest\""
+            echo "LIST LINK: ln -sfv \"$path\" \"$dest\""
         else
-            echo "DRY RUN: ln -sfv \"$path\" \"$dest\""
+            echo "DRY RUN LINK: ln -sfv \"$path\" \"$dest\""
         fi
         return 0
     fi
 
     mkdir -p "$(dirname "$dest")" || return 1
+    echo "LINK: $dest"
     ln -sfv "$path" "$dest"
+}
+
+function copy_profile_file {
+    local path="$1"
+    local dest="$2"
+    local base="$3"
+
+    [ "$base" = ".DS_Store" ] && return 0
+
+    # shellcheck disable=SC2034
+    DOTFILES_ITERATE_COUNTED=1
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "$LIST_ONLY" -eq 1 ]; then
+            echo "LIST COPY: cp -f \"$path\" \"$dest\""
+        else
+            echo "DRY RUN COPY: cp -f \"$path\" \"$dest\""
+        fi
+        return 0
+    fi
+
+    mkdir -p "$(dirname "$dest")" || return 1
+    rm -f "$dest" || return 1
+    echo "COPY: $dest"
+    cp -fv "$path" "$dest"
 }
 
 function install_profiles {
     local profiles_dir="$SCRIPT_DIR/profiles"
     local status=0
+    local processed=0
     local profile_dir
 
     dotfiles.collect_profiles "$profiles_dir" "$PROFILE" || return 1
 
     for profile_dir in "${DOTFILES_PROFILES[@]}"; do
-        dotfiles.sync_profile_files "$SCRIPT_DIR" "$profile_dir" "Installing" install_profile_file || status=1
+        echo "Installing $BOLD$profile_dir$NORM profile..."
+        echo
+
+        dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "home" install_profile_file || status=1
+        processed=$((processed + ${DOTFILES_LAST_PROCESSED:-0}))
+
+        if dotfiles.optional_profile_tree_exists "$SCRIPT_DIR" "$profile_dir" "copy"; then
+            dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "copy" copy_profile_file || status=1
+            processed=$((processed + ${DOTFILES_LAST_PROCESSED:-0}))
+        fi
+
+        if [ "$DRY_RUN" -eq 1 ]; then
+            echo
+            echo "Plan complete: would process $processed file(s)."
+        else
+            echo
+        fi
     done
 
     return "$status"

@@ -35,6 +35,10 @@ Use `--profile all` with `install_shell_profile`, `pull_shell_profile`, or `refr
 
 Within each profile, files intended to mirror `$HOME` live under `home/`. For example, the default shell startup files live under `profiles/default/home/`.
 
+Files that should be installed as regular copies rather than symlinks live under `copy/`. For example, the iTerm dynamic profile now lives under `profiles/default/copy/` and is copied into place by `install_shell_profile`.
+
+`refresh` also applies the managed iTerm2 default bookmark GUID so new iTerm2 windows open with the intended dynamic profile.
+
 ## Configuration
 The managed profiles currently set:
 - `DOTFILES_DIR=/Users/mattriley/Home/Code/my-dotfiles`

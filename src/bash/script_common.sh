@@ -81,25 +81,32 @@ function dotfiles.collect_profiles {
     }
 }
 
-function dotfiles.sync_profile_files {
+function dotfiles.profile_tree_path {
     local script_dir="$1"
     local profile="$2"
-    local action_label="$3"
+    local tree="$3"
+
+    printf '%s\n' "$script_dir/profiles/$profile/$tree"
+}
+
+function dotfiles.sync_profile_tree {
+    local script_dir="$1"
+    local profile="$2"
+    local tree="$3"
     local handler="$4"
-    local target="$script_dir/profiles/$profile/home"
+    local target
     local failures=0
     local processed=0
     local path
     local dest
     local base
 
+    target="$(dotfiles.profile_tree_path "$script_dir" "$profile" "$tree")"
+
     if [ ! -d "$target" ]; then
-        echo "Error: profile home directory not found: $target" >&2
+        echo "Error: profile $tree directory not found: $target" >&2
         return 1
     fi
-
-    echo "$action_label $BOLD$profile$NORM profile..."
-    echo
 
     while IFS= read -r -d '' path; do
         dest="$HOME${path#"$target"}"
@@ -116,8 +123,7 @@ function dotfiles.sync_profile_files {
     done < <(find "$target" -type f -print0)
 
     if [ "$DRY_RUN" -eq 1 ]; then
-        echo
-        echo "Plan complete: would process $processed file(s)."
+        DOTFILES_LAST_PROCESSED="$processed"
         return 0
     fi
 
@@ -126,5 +132,15 @@ function dotfiles.sync_profile_files {
         return 1
     fi
 
-    echo
+    DOTFILES_LAST_PROCESSED="$processed"
+}
+
+function dotfiles.optional_profile_tree_exists {
+    local script_dir="$1"
+    local profile="$2"
+    local tree="$3"
+    local target
+
+    target="$(dotfiles.profile_tree_path "$script_dir" "$profile" "$tree")"
+    [ -d "$target" ]
 }
