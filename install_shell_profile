@@ -31,6 +31,7 @@ function install_profile_file {
     fi
 
     mkdir -p "$(dirname "$dest")" || return 1
+    rm -f "$dest" || return 1
     echo "LINK: $dest"
     ln -sfv "$path" "$dest"
 }

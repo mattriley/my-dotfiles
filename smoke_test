@@ -481,6 +481,16 @@ out="$(
 [ ! -L "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles/Matt Riley.json" ] || fail "install_shell_profile should copy, not symlink, copy-managed files"
 rm -rf "$tmp_home"
 
+echo "OK: install_shell_profile replaces broken symlinks for link-managed files"
+tmp_home="$(make_temp_home)"
+ln -s "$SCRIPT_DIR/profiles/default/home/.bashrc" "$tmp_home/.bashrc"
+out="$(
+  HOME="$tmp_home" bash --noprofile --norc "$SCRIPT_DIR/install_shell_profile" --profile default 2>&1
+)"
+[ -L "$tmp_home/.bashrc" ] || fail "install_shell_profile should keep link-managed files as symlinks"
+[ "$(readlink "$tmp_home/.bashrc")" = "$SCRIPT_DIR/profiles/default/link/.bashrc" ] || fail "install_shell_profile should replace broken link-managed symlinks"
+rm -rf "$tmp_home"
+
 echo "OK: install_shell_profile replaces broken symlinks for copy-managed files"
 tmp_home="$(make_temp_home)"
 mkdir -p "$tmp_home/Library/Application Support/iTerm2/DynamicProfiles"
