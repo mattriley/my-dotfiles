@@ -14,4 +14,9 @@ if [ ! -f "$HOME/.zshrc" ]; then
 fi
 
 export DOTFILES_ZPROFILE_LOADED=1
+
+case $- in
+    *i*) return 0 ;;
+esac
+
 source "$HOME/.zshrc"
