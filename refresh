@@ -19,9 +19,9 @@ parse_status=$?
 
 overall_status=0
 if [ "$DRY_RUN" -eq 1 ]; then
-    "$SCRIPT_DIR/install_shell_profile" --dry-run --profile "$PROFILE" || overall_status=1
+    "$SCRIPT_DIR/apply_profile" --dry-run --profile "$PROFILE" || overall_status=1
 else
-    "$SCRIPT_DIR/install_shell_profile" --profile "$PROFILE" || overall_status=1
+    "$SCRIPT_DIR/apply_profile" --profile "$PROFILE" || overall_status=1
 fi
 
 # shellcheck disable=SC1090,SC1091
