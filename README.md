@@ -29,13 +29,13 @@ Run `./smoke_test` to verify that the shell modules load and that key failure pa
 ### Profile planning
 Use `./install_shell_profile --list` or `./install_shell_profile --plan` to see which files would be symlinked into `$HOME`.
 
-Use `./pull_shell_profile --list` or `./pull_shell_profile --plan` to see which files would be copied back into the repo-managed `profiles/<profile>/home/` tree.
+Use `./pull_shell_profile --list` or `./pull_shell_profile --plan` to see which files would be copied back into the repo-managed profile trees.
 
 Use `--profile all` with `install_shell_profile`, `pull_shell_profile`, or `refresh` to operate on every profile directory under `profiles/`.
 
-Within each profile, files intended to mirror `$HOME` live under `home/`. For example, the default shell startup files live under `profiles/default/home/`.
+Within each profile, symlink-managed files live under `link/`, and copy-managed files live under `copy/`. For example, the default shell startup files live under `profiles/default/link/`.
 
-Files that should be installed as regular copies rather than symlinks live under `copy/`. For example, the iTerm dynamic profile now lives under `profiles/default/copy/` and is copied into place by `install_shell_profile`.
+Files that should be installed as regular copies rather than symlinks live under `copy/`. For example, the iTerm dynamic profile lives under `profiles/default/copy/` and is copied into place by `install_shell_profile`.
 
 `refresh` also applies the managed iTerm2 default bookmark GUID so new iTerm2 windows open with the intended dynamic profile.
 
@@ -47,7 +47,7 @@ The managed profiles currently set:
 - `.zprofile` requires `.zshrc`; zsh initialization lives in `.zshrc`, while `.zprofile` is only the login-shell wrapper
 - personal machine/user defaults live in [dotfiles_personal.sh](/Users/mattriley/Home/Code/my-dotfiles/dotfiles_personal.sh)
 
-If the repository path changes, update [profiles/default/home/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/home/.bashrc) so both bash and zsh load shared modules from the correct location.
+If the repository path changes, update [profiles/default/link/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/link/.bashrc) so both bash and zsh load shared modules from the correct location.
 
 ## Quality Checks
 GitHub Actions runs:

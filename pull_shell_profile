@@ -73,7 +73,7 @@ function pull_profiles {
         echo "Pulling $BOLD$profile_dir$NORM profile..."
         echo
 
-        dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "home" pull_profile_file || status=1
+        dotfiles.sync_profile_tree "$SCRIPT_DIR" "$profile_dir" "link" pull_profile_file || status=1
         processed=$((processed + ${DOTFILES_LAST_PROCESSED:-0}))
 
         if dotfiles.optional_profile_tree_exists "$SCRIPT_DIR" "$profile_dir" "copy"; then
