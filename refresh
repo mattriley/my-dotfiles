@@ -24,11 +24,11 @@ else
     "$SCRIPT_DIR/install_shell_profile" --profile "$PROFILE" || overall_status=1
 fi
 
-# shellcheck disable=SC1091
-[ -f "$DOTFILES_DIR/dotfiles_personal.sh" ] && source "$DOTFILES_DIR/dotfiles_personal.sh"
+# shellcheck disable=SC1090,SC1091
+[ -f "$DOTFILES_DIR/profiles/$PROFILE/env.sh" ] && source "$DOTFILES_DIR/profiles/$PROFILE/env.sh"
 
 if [ "$DRY_RUN" -eq 0 ]; then
-    brew.bundle_dump "$SCRIPT_DIR" || overall_status=1
+    brew.bundle_dump "$SCRIPT_DIR" "$PROFILE" || overall_status=1
     vscode.sort_settings "$SCRIPT_DIR" "$PROFILE" || overall_status=1
 fi
 [ "$DRY_RUN" -eq 1 ] || git.set_author.default || overall_status=1

@@ -18,10 +18,10 @@ To switch iTerm back to bash:
 Run `./install_dependencies` to install the small set of external tools this repo expects for validation and maintenance. The script is rerunnable and skips packages that are already installed.
 
 ### Homebrew sync
-Use [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) to track Homebrew formulas, casks, VS Code extensions, and npm packages managed through Homebrew Bundle.
+Use [profiles/default/Brewfile](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/Brewfile) to track Homebrew formulas, casks, VS Code extensions, and npm packages managed through Homebrew Bundle.
 
-- `refresh` updates [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) on non-dry runs through `brew.bundle_dump`.
-- `brew.bundle_install` is available as a bash module function for applying [Brewfile](/Users/mattriley/Home/Code/my-dotfiles/Brewfile) from an interactive shell when needed.
+- `refresh` updates [profiles/default/Brewfile](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/Brewfile) on non-dry runs through `brew.bundle_dump`.
+- `brew.bundle_install` is available as a bash module function for applying [profiles/default/Brewfile](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/Brewfile) from an interactive shell when needed.
 
 ### Validation
 Run `./smoke_test` to verify that the shell modules load and that key failure paths still behave safely. It does not write to `$HOME`.
@@ -45,7 +45,7 @@ The managed profiles currently set:
 - `BASH_MODULES=$DOTFILES_DIR/src/bash/modules`
 - `.bash_profile` requires `.bashrc`; bash initialization lives in `.bashrc`, while `.bash_profile` is only the login-shell wrapper
 - `.zprofile` requires `.zshrc`; zsh initialization lives in `.zshrc`, while `.zprofile` is only the login-shell wrapper
-- personal machine/user defaults live in [dotfiles_personal.sh](/Users/mattriley/Home/Code/my-dotfiles/dotfiles_personal.sh)
+- profile-specific environment defaults live in [profiles/default/env.sh](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/env.sh)
 
 If the repository path changes, update [profiles/default/link/.bashrc](/Users/mattriley/Home/Code/my-dotfiles/profiles/default/link/.bashrc) so both bash and zsh load shared modules from the correct location.
 
