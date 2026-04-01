@@ -9,9 +9,6 @@ export ITERMOCIL_LAYOUT_HIGHRES="even-vertical"
 export ITERMOCIL_LAYOUT="${ITERMOCIL_LAYOUT:-$ITERMOCIL_LAYOUT_DEFAULT}"
 export ITERM2_DEFAULT_BOOKMARK_GUID="1d0710f9-a566-46ee-8710-fe0b46619ce2"
 
-# WARNING: Naming this VSCODE_EXTENSIONS will conflict and cause side effects with VSCode.
-export MY_VSCODE_EXTENSIONS="bierner.markdown-mermaid | dbaeumer.vscode-eslint | dnicolson.binary-plist | marp-team.marp-vscode | timonwong.shellcheck | vscode-icons-team.vscode-icons"
-
 export MY_AUTHOR_NAME="Matt Riley"
 export MY_AUTHOR_EMAIL="m@ttriley.dev"
 export MY_AUTHOR_URL="https://github.com/mattriley"

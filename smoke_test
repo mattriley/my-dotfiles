@@ -333,8 +333,6 @@ require_func "iterm2.set_default_bookmark"
 require_func "iterm2.set_default_bookmark.default"
 require_func "macos.set_screencapture_location"
 require_func "macos.set_screencapture_location.default"
-require_func "vscode.install_extensions"
-require_func "vscode.install_extensions.default"
 require_func "vscode.sort_settings"
 require_func "vscode.setup_shell_command"
 
@@ -430,31 +428,6 @@ out="$(
   ' _ "$MODULES_DIR/git/gcu.sh" "$MODULES_DIR/git/push.sh"
 )"
 expect_contains "$out" 'gcu "$@" && git push' "git.push is not calling gcu"
-
-echo "OK: vscode.install_extensions.default no-ops when no extensions are configured"
-out="$(
-  bash --noprofile --norc -c '
-    source "$1"
-    unset MY_VSCODE_EXTENSIONS
-    output="$(vscode.install_extensions.default 2>&1)"
-    if [ -n "$output" ]; then
-      printf "%s\n" "$output"
-    fi
-    printf "status:%s" "$?"
-  ' _ "$MODULES_DIR/vscode/install_extensions.sh"
-)"
-expect_eq "$out" "status:0" "vscode.install_extensions.default should no-op cleanly"
-
-echo "OK: vscode.install_extensions accepts an explicit extension list"
-out="$(
-  bash --noprofile --norc -c '
-    source "$1"
-    util.has_command() { return 0; }
-    code() { printf "code:%s\n" "$2"; }
-    vscode.install_extensions "foo.bar|baz.qux"
-  ' _ "$MODULES_DIR/vscode/install_extensions.sh"
-)"
-expect_eq "$out" $'code:foo.bar\ncode:baz.qux' "vscode.install_extensions should use explicit arguments when provided"
 
 echo "OK: apply_profile supports --profile all in plan mode"
 out="$(
