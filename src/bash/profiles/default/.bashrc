@@ -77,7 +77,7 @@ if [ -n "${BASH_VERSION:-}" ]; then
 
     function t { npx -p "task-library" task "$@"; }
 
-    if [ "$profile_common_loaded" -eq 1 ] && dotfiles.has_function "display.is-highres"; then
+    if [ "$profile_common_loaded" -eq 1 ] && dotfiles.has_function "display.is_highres"; then
         display.is_highres && export ITERMOCIL_LAYOUT="$ITERMOCIL_LAYOUT_HIGHRES"
         dotfiles.apply_prompt "$is_interactive"
         dotfiles.setup_node

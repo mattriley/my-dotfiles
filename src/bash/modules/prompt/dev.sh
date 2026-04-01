@@ -22,5 +22,9 @@ function prompt.dev_default {
 }
 
 function prompt.dev {
+    if [ -n "${ZSH_VERSION:-}" ]; then
+        setopt prompt_subst
+    fi
+
     export PS1="${1:-$(prompt.dev_default)}"
 }
