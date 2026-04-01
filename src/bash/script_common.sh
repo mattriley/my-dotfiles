@@ -86,7 +86,7 @@ function dotfiles.sync_profile_files {
     local profile="$2"
     local action_label="$3"
     local handler="$4"
-    local target="$script_dir/profiles/$profile"
+    local target="$script_dir/profiles/$profile/home"
     local failures=0
     local processed=0
     local path
@@ -94,7 +94,7 @@ function dotfiles.sync_profile_files {
     local base
 
     if [ ! -d "$target" ]; then
-        echo "Error: profile directory not found: $target" >&2
+        echo "Error: profile home directory not found: $target" >&2
         return 1
     fi
 
