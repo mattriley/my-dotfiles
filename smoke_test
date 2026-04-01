@@ -443,6 +443,7 @@ out="$(
 )"
 expect_not_contains "$out" "Error: profile link directory not found" "capture_profile should expand --profile all"
   expect_not_contains "$out" "Error: profile copy directory not found" "capture_profile should expand --profile all"
+expect_contains "$out" 'LIST BREW: brew bundle dump --file "/Users/mattriley/Home/Code/my-dotfiles/profiles/default/Brewfile" --force' "capture_profile should include a Brewfile dump"
 
 echo "OK: apply_profile copies copy-managed files"
 tmp_home="$(make_temp_home)"

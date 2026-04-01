@@ -3,6 +3,8 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/src/bash/script_common.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/src/bash/modules/brew/bundle_dump.sh"
 
 dotfiles.setup_styles
 dotfiles.parse_profile_args "Usage: $0 [--dry-run|--list|--plan] [--profile <name|all>]" 1 "$@"
@@ -86,6 +88,16 @@ function pull_profiles {
             echo "Plan complete: would process $processed file(s)."
         else
             echo
+        fi
+
+        if [ "$DRY_RUN" -eq 1 ]; then
+            if [ "$LIST_ONLY" -eq 1 ]; then
+                echo "LIST BREW: brew bundle dump --file \"$SCRIPT_DIR/profiles/$profile_dir/Brewfile\" --force"
+            else
+                echo "DRY RUN BREW: brew bundle dump --file \"$SCRIPT_DIR/profiles/$profile_dir/Brewfile\" --force"
+            fi
+        else
+            brew.bundle_dump "$SCRIPT_DIR" "$profile_dir" || status=1
         fi
     done
 
