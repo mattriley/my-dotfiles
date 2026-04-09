@@ -138,7 +138,6 @@
   },
   "vsicons.dontShowNewVersionMessage": true,
   "window.commandCenter": true,
-  "window.zoomLevel": 1,
-  "workbench.editor.enablePreview": false,
-  "workbench.iconTheme": "material-icon-theme"
+"window.zoomLevel": 1,
+"workbench.iconTheme": "material-icon-theme"
 }
